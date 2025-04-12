@@ -396,6 +396,8 @@ const MapWithRouting: FC = () => {
                 {/* Component to smoothly change map center if needed */}
                 {mapCenter && <ChangeMapCenter center={mapCenter} />}
             </MapContainer>
+
+            <Button variant={"contained"}> Zakończ trasę</Button>
         </Box>
     );
 };

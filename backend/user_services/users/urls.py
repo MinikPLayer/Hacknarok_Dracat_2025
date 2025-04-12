@@ -9,5 +9,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 
     path('user/', views.OneUserData.as_view(), name='user'),
+    path('generate/', LlamaGenerateView.as_view(), name='llama-generate'),
 
 ]

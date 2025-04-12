@@ -14,6 +14,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import AppUser
 from users.serializers import UserRegisterSerializer, UserSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
 
 
 
@@ -117,3 +122,22 @@ class OneUserData(APIView):
         user = request.user
         user.delete()
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .llama_model import generate_response
+
+class LlamaGenerateView(APIView):
+    def post(self, request):
+        prompt = request.data.get("prompt", "")
+        if not prompt:
+            return Response({"error": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            response = generate_response(prompt)
+            return Response({"response": response})
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
