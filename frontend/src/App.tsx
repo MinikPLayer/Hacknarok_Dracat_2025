@@ -14,8 +14,8 @@ import MapWithPins from "./components/mapWithPins/mapWithPins";
 import ImageSwiper from "./components/imageSwiper/imageSwiper";
 import Notifications from "./components/notifications/notifications"
 import FormModule from './components/form/formModule';
-
 import FeedbackForm from "./components/feedbackForm/feedbackForm";
+import RankingPage from './components/ranking/ranking';
 
 function App() {
   return (
@@ -40,6 +40,7 @@ function App() {
                         <Route path="/userProfile/:id" element={<UserProfile isOwnProfile={false}/>}/>
                         <Route path="/form" element={<FormModule/>}/>
                         <Route path="/feedback" element={<FeedbackForm/>}/>
+                        <Route path="/ranking" element={<RankingPage/>}/>
 
                     </Routes>
                 </div>
