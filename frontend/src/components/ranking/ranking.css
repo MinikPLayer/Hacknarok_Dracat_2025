@@ -1,4 +1,4 @@
-/* rankingPage.css */
+/* ranking.css */
 :root {
     --primary-color: #3498db;
     --secondary-color: #2ecc71;
@@ -10,12 +10,13 @@
     --border-color: #e0e0e0;
     --background-light: #f9f9f9;
     --current-user-bg: #e3f2fd;
+    --level-active-bg: #e8f4f8;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
   }
   
   .ranking-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 2rem auto;
     padding: 1.5rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +24,7 @@
   
   .ranking-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
   }
   
   .ranking-header h1 {
@@ -42,13 +43,42 @@
     margin: 0;
   }
   
+  /* Level selector styles */
+  .level-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+  
+  .level-filter {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+  }
+  
+  .level-filter:hover {
+    background: var(--background-light);
+  }
+  
+  .level-filter.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
   /* Podium styles */
   .podium-container {
     display: flex;
     justify-content: center;
     align-items: flex-end;
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 6rem;
   }
   
   .podium-item {
@@ -150,15 +180,59 @@
     gap: 0.3rem;
   }
   
-  /* Ranking list styles */
-  .ranking-list {
+  /* Levels ranking styles */
+  .levels-ranking {
+    margin-bottom: 2rem;
+  }
+  
+  .level-group {
+    margin-bottom: 1rem;
     background: white;
     border-radius: 12px;
     box-shadow: var(--shadow);
-    margin-bottom: 2rem;
     overflow: hidden;
   }
   
+  .level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    background-color: var(--background-light);
+  }
+  
+  .level-header:hover {
+    background-color: var(--level-active-bg);
+  }
+  
+  .level-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .users-count {
+    font-size: 0.9rem;
+    color: var(--light-text);
+    font-weight: normal;
+  }
+  
+  .toggle-icon {
+    color: var(--light-text);
+    transition: var(--transition);
+  }
+  
+  /* Ranking list styles */
+  .ranking-list {
+    background: white;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+  }
   
   .ranking-list-header {
     display: grid;
@@ -254,11 +328,19 @@
   }
   
   .user-rank {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     font-size: 2rem;
     font-weight: bold;
     color: var(--primary-color);
     min-width: 80px;
-    text-align: center;
+  }
+  
+  .user-level {
+    font-size: 1rem;
+    color: var(--light-text);
+    font-weight: normal;
   }
   
   .user-details {
@@ -300,10 +382,15 @@
   
   /* Responsive design */
   @media (max-width: 768px) {
+    .ranking-container {
+      padding: 1rem;
+    }
+  
     .podium-container {
       flex-direction: column;
       align-items: center;
       gap: 1rem;
+    
     }
   
     .podium-item {
@@ -331,12 +418,17 @@
   }
   
   @media (max-width: 480px) {
-    .ranking-container {
-      padding: 1rem;
-    }
-  
     .ranking-header h1 {
       font-size: 1.8rem;
+    }
+  
+    .level-selector {
+      gap: 0.3rem;
+    }
+  
+    .level-filter {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
     }
   
     .ranking-list-header, .ranking-item {

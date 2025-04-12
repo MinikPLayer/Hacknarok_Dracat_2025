@@ -29,7 +29,6 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Homepage/>}/>
                         <Route path="/userProfile" element={<UserProfile isOwnProfile={true}/>}/>
-
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/logout" element={<Logout/>}/>
