@@ -1,220 +1,248 @@
 .profile-container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-  }
-  
-  .profile-columns {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .left-column {
-    flex: 1;
-    max-width: 300px;
-  }
-  
-  .right-column {
-    flex: 2;
-  }
-  
-  .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-  }
-  
-  .button-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .achievements {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .statistics-section {
-    margin-top: 20px;
-  }
-  
-  .chart-container {
-    margin-bottom: 30px;
-  }
+  padding: 15px;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  /* Ogólne style */
-.profile-container {
-    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
+.profile-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.left-column {
+  width: 100%;
+}
+
+.right-column {
+  width: 100%;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.profile-info {
+  width: 100%;
+}
+
+.name {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #2c3e50;
+  word-break: break-word;
+}
+
+.rank-title {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background: #bdc3c7;
+  margin: 20px 0;
+}
+
+.achievements {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px 0;
+}
+
+.achievement-icon {
+  font-size: 1.8rem;
+  color: #3498db;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.achievement-icon:hover {
+  transform: scale(1.1);
+}
+
+.bio-section {
+  margin: 20px 0;
+}
+
+.bio-section h3 {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.bio-text-editable {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.challenge-button {
+  width: 100%;
+  padding: 12px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  box-sizing: border-box;
+}
+
+.challenge-button:hover {
+  background: #c0392b;
+}
+
+.friends-section {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.friends-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.friend-item {
+  padding: 10px;
+  margin: 5px 0;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.qr-code-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.qr-code-wrapper {
+  margin: 15px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.qr-code-instruction {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+.copy-link-button {
+  width: 100%;
+  padding: 12px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  box-sizing: border-box;
+}
+
+.copy-link-button:hover {
+  background: #27ae60;
+}
+
+.chart-container {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-container h4 {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+/* Tablet i większe */
+@media (min-width: 768px) {
   .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    flex-direction: row;
+    text-align: left;
+    align-items: flex-start;
   }
   
-  .profile-header h2 {
-    font-size: 1.8rem;
-    color: #333;
-  }
-  
-  .divider {
-    border: 0;
-    height: 1px;
-    background: #ccc;
-    margin: 20px 0;
-  }
-  
-  /* Ikony osiągnięć */
   .achievements {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
+    justify-content: space-between;
   }
   
   .achievement-icon {
-    transition: transform 0.3s, color 0.3s;
-    cursor: pointer;
+    font-size: 2rem;
   }
-  
-  .achievement-icon:hover {
-    transform: scale(1.2);
-    color: #ff9800;
-  }
-  
-  /* Bio */
-  .bio-text-editable {
-    width: 100%;
-    min-height: 80px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 1rem;
-    resize: none;
-    background: #fff;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .bio-text-editable:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  /* Wykresy */
-  .chart-container {
-    margin-top: 20px;
-    padding: 15px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .chart-container h4 {
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    color: #555;
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+  .profile-columns {
+    flex-direction: row;
   }
 
-  .challenge-button {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: #fff;
-    background: linear-gradient(135deg, #ff5722, #ff9800);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .challenge-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  .left-column {
+    flex: 0 0 350px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
   }
 
-  /* Sekcja znajomych */
-.friends-section {
-    margin-top: 20px;
-  }
-  
-  .friends-section h3 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 10px;
+  .right-column {
+    flex: 1;
   }
   
   .friends-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    max-height: 150px;
   }
-  
-  .friend-item {
-    padding: 5px 10px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    font-size: 1rem;
-    color: #555;
-  }
-  
-  .add-friend {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .add-friend-input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-  }
-  
-  .add-friend-button {
-    padding: 8px 15px;
-    font-size: 1rem;
-    color: #fff;
-    background: linear-gradient(135deg, #4caf50, #81c784);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .add-friend-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
+}
 
-  /* Przycisk kopiowania linku */
-.copy-link-button {
-    margin-top: 10px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    color: #fff;
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+/* Bardzo małe ekrany */
+@media (max-width: 400px) {
+  .profile-container {
+    padding: 10px;
   }
   
-  .copy-link-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  .name {
+    font-size: 1.3rem;
   }
+  
+  .achievement-icon {
+    font-size: 1.5rem;
+  }
+  
+  .chart-container {
+    padding: 10px;
+  }
+  
+  .chart-container h4 {
+    font-size: 1rem;
+  }
+}

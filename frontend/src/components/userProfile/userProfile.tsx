@@ -102,125 +102,134 @@ useEffect(() => {
 }, [isOwnProfile]);
 
 
-  return (
-    <div className="profile-container">
-      <div className="profile-columns">
-        {/* Lewa kolumna */}
-        <div className="left-column">
-          <div className="profile-header">
-            <Avatar src={image || '/images/basic/user_no_picture.png'} />
-            <div>
-              <h2 className="name">{userData?.name || 'Użytkownik'}</h2>
-              <p>
-                {userData?.rank || 'Brak rangi'}
-                <br />
-                {userData?.title || 'Brak tytułu'}
-              </p>
-            </div>
+return (
+  <div className="profile-container">
+    <div className="profile-columns">
+      {/* Lewa kolumna */}
+      <div className="left-column">
+        <div className="profile-header">
+          <Avatar 
+            src={image || '/images/basic/user_no_picture.png'} 
+            sx={{ 
+              width: { xs: 60, md: 80 }, 
+              height: { xs: 60, md: 80 } 
+            }}
+          />
+          <div className="profile-info">
+            <h2 className="name">{userData?.name || 'Użytkownik'}</h2>
+            <p className="rank-title">
+              {userData?.rank || 'Brak rangi'}
+              <br />
+              {userData?.title || 'Brak tytułu'}
+            </p>
           </div>
+        </div>
 
-          <hr className="divider" />
+        <hr className="divider" />
 
-          <div className="achievements">
-            <FaMedal size={40} className="achievement-icon" title="Osiągnięcie 1" />
-            <FaTrophy size={40} className="achievement-icon" title="Osiągnięcie 2" />
-            <FaStar size={40} className="achievement-icon" title="Osiągnięcie 3" />
-            <FaCrown size={40} className="achievement-icon" title="Osiągnięcie 4" />
-          </div>
+        <div className="achievements">
+          <FaMedal className="achievement-icon" title="Osiągnięcie 1" />
+          <FaTrophy className="achievement-icon" title="Osiągnięcie 2" />
+          <FaStar className="achievement-icon" title="Osiągnięcie 3" />
+          <FaCrown className="achievement-icon" title="Osiągnięcie 4" />
+        </div>
 
-          <div>
-            <h3>BIO</h3>
-            {isOwnProfile ? (
-              <textarea
-                className="bio-text-editable"
-                value={userData?.bio || ''}
-                onChange={(e) => setUserData({ ...userData, bio: e.target.value })}
-                placeholder="Dodaj swój opis..."
-              />
-            ) : (
-              <button className="challenge-button" onClick={() => alert('Wysłano wyzwanie!')}>
-                Wyślij wyzwanie
-              </button>
-            )}
-          </div>
-          <hr className="divider" />
+        <div className="bio-section">
+          <h3>BIO</h3>
+          {isOwnProfile ? (
+            <textarea
+              className="bio-text-editable"
+              value={userData?.bio || ''}
+              onChange={(e) => setUserData({ ...userData, bio: e.target.value })}
+              placeholder="Dodaj swój opis..."
+            />
+          ) : (
+            <button className="challenge-button" onClick={() => alert('Wysłano wyzwanie!')}>
+              Wyślij wyzwanie
+            </button>
+          )}
+        </div>
 
-          {/* Sekcja znajomych */}
-          <div className="friends-section">
-            <h3>Znajomi</h3>
-            <ul className="friends-list">
-              {friends.map((friend, index) => (
-                <li key={index} className="friend-item">
-                  {friend}
-                </li>
-              ))}
-            </ul>
+        <hr className="divider" />
 
-            {isOwnProfile && (
-              <div className="qr-code-section">
-                <h4>Udostępnij swój kod QR</h4>
-                <QRCode value={qrCodeValue} size={150} />
-                <p className="qr-code-instruction">Zeskanuj kod QR, aby dodać znajomego!</p>
-                <button
-                  className="copy-link-button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(qrCodeValue);
-                    alert('Link został skopiowany do schowka!');
-                  }}
-                >
-                  Skopiuj link do dodania znajomego
-                </button>
+        {/* Sekcja znajomych */}
+        <div className="friends-section">
+          <h3>Znajomi</h3>
+          <ul className="friends-list">
+            {friends.map((friend, index) => (
+              <li key={index} className="friend-item">
+                {friend}
+              </li>
+            ))}
+          </ul>
+
+          {isOwnProfile && (
+            <div className="qr-code-section">
+              <h4>Udostępnij swój kod QR</h4>
+              <div className="qr-code-wrapper">
+                <QRCode value={qrCodeValue} size={100} />
               </div>
-            )}
-          </div>
-          </div>
-
-        {/* Prawa kolumna */}
-        <div className="right-column">
-          <div className="statistics-section">
-            <h3>Statystyki</h3>
-
-            {/* Wykres miesięcznych odwiedzin */}
-            <div className="chart-container">
-              <h4>Miesięczne odwiedziny</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={monthlyVisits}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="visits" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
+              <p className="qr-code-instruction">Zeskanuj kod QR, aby dodać znajomego!</p>
+              <button
+                className="copy-link-button"
+                onClick={() => {
+                  navigator.clipboard.writeText(qrCodeValue);
+                  alert('Link został skopiowany do schowka!');
+                }}
+              >
+                Skopiuj link
+              </button>
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* Wykres najczęściej uczęszczanych "genre" */}
-            <div className="chart-container">
-              <h4>Najczęściej uczęszczane gatunki</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Tooltip />
-                  <Pie
-                    data={genreData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    label
-                  >
-                    {genreData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+      {/* Prawa kolumna */}
+      <div className="right-column">
+        <div className="statistics-section">
+          <h3>Statystyki</h3>
+
+          {/* Wykres miesięcznych odwiedzin */}
+          <div className="chart-container">
+            <h4>Miesięczne odwiedziny</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlyVisits}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="visits" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Wykres gatunków */}
+          <div className="chart-container">
+            <h4>Najczęściej uczęszczane gatunki</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Tooltip />
+                <Pie
+                  data={genreData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  label
+                >
+                  {genreData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default UserProfile;
