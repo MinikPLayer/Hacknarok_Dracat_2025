@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { isUserAuthenticated } from "../../AuthContext";
 import { Navigate } from 'react-router-dom';
 
-
 const Main = () => {
     const [groups, setGroups] = useState([]);
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
+    const [lastTrip, setLastTrip] = useState(null); // Informacje o ostatniej podróży
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -25,6 +25,11 @@ const Main = () => {
                 { id: 1, title: 'Recommendation 1' },
                 { id: 2, title: 'Recommendation 2' }
             ]);
+            setLastTrip({
+                destination: 'Paris',
+                date: '2025-03-20',
+                description: 'A wonderful trip to Paris with friends.'
+            });
             setLoading(false);
         }
     }, []);
@@ -43,47 +48,25 @@ const Main = () => {
             <h1 className="mb-4">Welcome to Your Dashboard</h1>
 
             <section className="mb-5">
-                <h2>Your Groups</h2>
-                {groups.length === 0 ? (
-                    <p>You are not part of any groups.</p>
-                ) : (
-                    <ul className="list-group">
-                        {groups.map(group => (
-                            <li key={group.id} className="list-group-item">
-                                <a href={`/groups/${group.id}`}>{group.name}</a>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <h2>Navigation</h2>
+                <div className="d-flex flex-column">
+                    <a href="/ranking" className="btn btn-primary mb-2">Go to Ranking</a>
+                    <a href="/swiper" className="btn btn-secondary mb-2">Choose Your Next Trip</a>
+                </div>
             </section>
 
             <section className="mb-5">
-                <h2>Mini Calendar</h2>
-                {calendarEvents.length === 0 ? (
-                    <p>No upcoming events.</p>
+                <h2>Last Trip</h2>
+                {lastTrip ? (
+                    <div className="card">
+                        <div className="card-body">
+                            <h5 className="card-title">{lastTrip.destination}</h5>
+                            <h6 className="card-subtitle mb-2 text-muted">{lastTrip.date}</h6>
+                            <p className="card-text">{lastTrip.description}</p>
+                        </div>
+                    </div>
                 ) : (
-                    <ul className="list-group">
-                        {calendarEvents.map(event => (
-                            <li key={event.id} className="list-group-item">
-                                <strong>{event.date}</strong>: {event.name}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </section>
-
-            <section>
-                <h2>Recommendations</h2>
-                {recommendations.length === 0 ? (
-                    <p>No recommendations at the moment.</p>
-                ) : (
-                    <ul className="list-group">
-                        {recommendations.map(rec => (
-                            <li key={rec.id} className="list-group-item">
-                                {rec.title}
-                            </li>
-                        ))}
-                    </ul>
+                    <p>No information about the last trip.</p>
                 )}
             </section>
         </div>
