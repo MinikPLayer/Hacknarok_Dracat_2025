@@ -1,48 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import { isUserAuthenticated } from "../../AuthContext";
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import './main.css';
+import { FaMedal, FaRoute, FaCalendarAlt, FaArrowRight, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 
 const Main = () => {
-    const [groups, setGroups] = useState([]);
-    const [calendarEvents, setCalendarEvents] = useState([]);
-    const [recommendations, setRecommendations] = useState([]);
-    const [lastTrip, setLastTrip] = useState(null); // Informacje o ostatniej podróży
+    const navigate = useNavigate();
+    const [lastTrip, setLastTrip] = useState({
+        destination: "Kraków, Poland",
+        date: "15-18 June 2023",
+        rating: 4.5,
+        image: "https://images.unsplash.com/photo-1533856493584-0c6ca8ca9ce3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+    });
+    const [upcomingTrip, setUpcomingTrip] = useState({
+        destination: "Gdańsk, Poland",
+        date: "22-25 July 2023",
+        image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+    });
     const [loading, setLoading] = useState(false);
 
-
     if (!isUserAuthenticated()) {
-        // Redirect to login page if no token exists
         return <Navigate to="/login" />;
     }
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="loading-screen">
+                <div className="spinner"></div>
+                <p>Loading your travel data...</p>
+            </div>
+        );
     }
 
     return (
-        <div className="container mt-4">
-            <h1 className="mb-4">Welcome to Your Dashboard</h1>
+        <div className="dashboard-container">
+            {/* Nagłówek */}
+            <header className="dashboard-header">
+                <h1>Welcome back, Traveler!</h1>
+                <p>Discover your next adventure</p>
+            </header>
 
-            <section className="mb-5">
-                <h2>Navigation</h2>
-                <div className="d-flex flex-column">
-                    <a href="/ranking" className="btn btn-primary mb-2">Go to Ranking</a>
-                    <a href="/swiper" className="btn btn-secondary mb-2">Choose Your Next Trip</a>
-                </div>
+            {/* Szybkie akcje */}
+            <section className="quick-actions">
+                <button className="action-card" onClick={() => navigate('/ranking')}>
+                    <div className="action-icon">
+                        <FaMedal />
+                    </div>
+                    <h3>Ranking</h3>
+                    <p>See your position among friends</p>
+                    <span className="action-arrow"><FaArrowRight /></span>
+                </button>
+
+                <button className="action-card" onClick={() => navigate('/form')}>
+                    <div className="action-icon">
+                        <FaRoute />
+                    </div>
+                    <h3>New Trip</h3>
+                    <p>Plan your next journey</p>
+                    <span className="action-arrow"><FaArrowRight /></span>
+                </button>
             </section>
 
-            <section className="mb-5">
-                <h2>Last Trip</h2>
+            {/* Ostatnia podróż */}
+            <section className="trip-section">
+                <h2 className="section-title">Your Last Adventure</h2>
                 {lastTrip ? (
-                    <div className="card">
-                        <div className="card-body">
-                            <h5 className="card-title">{lastTrip.destination}</h5>
-                            <h6 className="card-subtitle mb-2 text-muted">{lastTrip.date}</h6>
-                            <p className="card-text">{lastTrip.description}</p>
+                    <div className="trip-card">
+                        <div className="trip-image" style={{ backgroundImage: `url(${lastTrip.image})` }}></div>
+                        <div className="trip-info">
+                            <div className="trip-header">
+                                <h3>{lastTrip.destination}</h3>
+                                <div className="trip-rating">
+                                    <FaStar className="star-icon" />
+                                    <span>{lastTrip.rating}</span>
+                                </div>
+                            </div>
+                            <p className="trip-date"><FaCalendarAlt /> {lastTrip.date}</p>
+                            <button className="btn-details" onClick={() => navigate('/trip-details')}>
+                                View Details <FaArrowRight />
+                            </button>
                         </div>
                     </div>
                 ) : (
-                    <p>No information about the last trip.</p>
+                    <div className="no-trips">
+                        <p>You haven't taken any trips yet.</p>
+                        <button className="btn-primary" onClick={() => navigate('/swiper')}>
+                            Plan Your First Trip
+                        </button>
+                    </div>
                 )}
             </section>
         </div>

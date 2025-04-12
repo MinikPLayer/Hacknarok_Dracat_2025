@@ -13,6 +13,8 @@ import UserProfile from './components/userProfile/userProfile';
 import MapWithPins from "./components/mapWithPins/mapWithPins";
 import ImageSwiper from "./components/imageSwiper/imageSwiper";
 import Notifications from "./components/notifications/notifications"
+import FormModule from './components/form/formModule';
+
 import FeedbackForm from "./components/feedbackForm/feedbackForm";
 
 function App() {
@@ -35,6 +37,8 @@ function App() {
                         <Route path="/map" element={<MapWithPins/>}/>
                         <Route path="/swiper" element={<ImageSwiper/>}/>
                         <Route path="/notifications" element={<Notifications/>}/>
+                        <Route path="/userProfile/:id" element={<UserProfile isOwnProfile={false}/>}/>
+                        <Route path="/form" element={<FormModule/>}/>
                         <Route path="/feedback" element={<FeedbackForm/>}/>
 
                     </Routes>
