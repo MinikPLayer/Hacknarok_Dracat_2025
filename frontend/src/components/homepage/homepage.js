@@ -1,7 +1,8 @@
+import {useTheme} from "@mui/material/styles";
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import ChatIcon from '@mui/icons-material/Chat';
 import React from 'react';
-import { Container, Typography, Button, Box, Paper, Stack, useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { CheckCircle, ChatDots, Calendar, Book } from "react-bootstrap-icons";
+import {Box, Button, Container, Paper, Stack, Typography, useMediaQuery} from "@mui/material";
 
 const features = [
   {
@@ -10,21 +11,14 @@ const features = [
     description: "Sprawdź progi punktowe, znajdź idealny kierunek i śledź ważne terminy. Dzięki MiUn rekrutacja staje się prostsza niż kiedykolwiek!"
   },
   {
-    icon: <ChatDots size={48} color="#2e7d32" />,
+    icon: <ChatIcon size={48} color="#2e7d32" />,
     title: "Forum studenckie",
     description: "Poznaj innych studentów, wymieniaj się doświadczeniami i ogłoszeniami. Organizuj wspólne wyjścia i dziel się poradami."
   },
-  {
-    icon: <Calendar size={48} color="#f9a825" />,
-    title: "Plan zajęć i powiadomienia",
-    description: "Synchronizuj harmonogram, otrzymuj przypomnienia o egzaminach i nie przegap żadnego wydarzenia."
-  },
-  {
-    icon: <Book size={48} color="#d32f2f" />,
-    title: "Baza materiałów",
-    description: "Korzystaj z notatek, dziel się wiedzą i przygotowuj się do sesji z pomocą społeczności MiUn."
-  }
+
 ];
+
+
 
 const Homepage = () => {
   const theme = useTheme();

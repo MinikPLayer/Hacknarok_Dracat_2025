@@ -23,12 +23,12 @@ function App() {
                 <div className="background-main min-vh-100">
                     <Routes>
                         <Route path="/" element={<Homepage/>}/>
-                        <Route path="/userProfile" element={<UserProfile/>}/>
+                        {/*<Route path="/userProfile" element={<UserProfile/>}/>*/}
 
-                        <Route path="/login" element={<Login/>}/>
-                        <Route path="/register" element={<Register/>}/>
-                        <Route path="/logout" element={<Logout/>}/>
-                        <Route path="/main" element={<Main/>}/>
+                        {/*<Route path="/login" element={<Login/>}/>*/}
+                        {/*<Route path="/register" element={<Register/>}/>*/}
+                        {/*<Route path="/logout" element={<Logout/>}/>*/}
+                        {/*<Route path="/main" element={<Main/>}/>*/}
                     </Routes>
                 </div>
                 {/* Routes */}
