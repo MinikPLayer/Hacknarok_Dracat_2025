@@ -13,6 +13,7 @@ import UserProfile from './components/userProfile/userProfile';
 import MapWithPins from "./components/mapWithPins/mapWithPins";
 import ImageSwiper from "./components/imageSwiper/imageSwiper";
 import Notifications from "./components/notifications/notifications"
+import FeedbackForm from "./components/feedbackForm/feedbackForm";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
                         <Route path="/map" element={<MapWithPins/>}/>
                         <Route path="/swiper" element={<ImageSwiper/>}/>
                         <Route path="/notifications" element={<Notifications/>}/>
+                        <Route path="/feedback" element={<FeedbackForm/>}/>
 
                     </Routes>
                 </div>

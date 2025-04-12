@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
@@ -52,3 +53,51 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+
+class Location(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=300)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    added_by = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
+    grade = models.FloatField(null=True, blank=True, default=0, max_length=5, validators=[MinValueValidator(0), MaxValueValidator(5)])
+
+    def __str__(self):
+        return f"Lokacja ID-{self.id}: {self.name}"
+
+
+class Notification(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=300)
+    isRead = models.BooleanField(default=False)
+    message = models.CharField(max_length=1000)
+    time_triggered = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Powiadomienie ID-{self.id}: {self.title}"
+
+
+class Review(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    stars = models.IntegerField(default=0)
+    opinion = models.TextField(blank=True, null=True)
+    video = models.URLField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Opinia ID-{self.id}"
+
+
+class Route(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    path = models.ManyToManyField(Location)
+
+    def __str__(self):
+        return f"Trasa ID-{self.id}"

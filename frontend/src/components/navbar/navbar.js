@@ -71,11 +71,12 @@ useEffect(() => {
     return (
         <div>
             {/* Navbar */}
-            <Navbar expand="lg" variant="dark" className="shadow-sm"  style={{ backgroundColor: "#0F7201FF" }}>
+            <Navbar expand="lg" variant="dark" className="shadow-sm"  style={{ backgroundColor: "#111111" }}>
                 <Container>
                     <Navbar.Brand className="text-primary fw-bold">
                         <Nav.Link href="/">
-                            <img style={{display: "inline", marginRight: 10}} width={50} alt ="catIcon" src={"media/kotelIcon.png"}/>
+                            <img style={{display: "inline", marginRight: 10}} width={50} alt ="catIcon" src={"" +
+                                "logo.png"}/>
                         </Nav.Link>
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls=" basic-navbar-nav"/>
