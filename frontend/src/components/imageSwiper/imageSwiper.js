@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGesture } from 'react-use-gesture';
 
-const TinderCard = ({ card, onSwipe, setLastSwipe }) => {
+const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState(0);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -9,7 +9,7 @@ const TinderCard = ({ card, onSwipe, setLastSwipe }) => {
   // Boundaries (X: left/right, Y: up/down)
   const maxX = 200;
   const maxY = 300;
-  const minY = -150; // Prevent excessive upward drag
+  const minY = navbarHeight - 150; // Adjusted to prevent excessive upward drag under the navbar
 
   const bind = useGesture({
     onDrag: ({ down, movement: [mx, my], velocity }) => {
@@ -17,14 +17,16 @@ const TinderCard = ({ card, onSwipe, setLastSwipe }) => {
         const direction =
           Math.abs(mx) > Math.abs(my)
             ? mx > 0 ? 'right' : 'left'
-            : my < 0 ? 'up' : 'down'; // Now detects 'down' (though unused)
+            : my < 0 ? 'up' : null; // Prevent downward swipe by checking only 'up' or left/right
 
-        if (direction === 'up') {
-          setLastSwipe('up');
-        } else if (direction === 'left' || direction === 'right') {
-          setLastSwipe(direction);
+        if (direction) {
+          if (direction === 'up') {
+            setLastSwipe('up');
+          } else if (direction === 'left' || direction === 'right') {
+            setLastSwipe(direction);
+          }
+          handleSwipe(direction);
         }
-        handleSwipe(direction);
       } else {
         // Apply boundaries
         const limitedX = Math.min(Math.max(mx, -maxX), maxX);
@@ -42,7 +44,6 @@ const TinderCard = ({ card, onSwipe, setLastSwipe }) => {
       right: { x: 500, y: 0 },
       left: { x: -500, y: 0 },
       up: { x: 0, y: -500 },
-      down: { x: 0, y: 500 } // Unused but defined for completeness
     }[direction];
 
     setPosition(finalPosition);
@@ -69,7 +70,8 @@ const TinderCard = ({ card, onSwipe, setLastSwipe }) => {
         borderRadius: '15px',
         boxShadow: '0 10px 20px rgba(0,0,0,0.19)',
         cursor: 'grab',
-        touchAction: 'none'
+        touchAction: 'none',
+        userSelect: 'none', // Prevent text selection (copying)
       }}
     >
       <div style={{ padding: '20px' }}>
@@ -93,6 +95,8 @@ const ImageSwiper = () => {
   ]);
   const [lastSwipe, setLastSwipe] = useState(null); // Track last swipe globally
 
+  const navbarHeight = 60; // Assuming navbar height is 60px (adjust based on actual navbar height)
+
   const handleSwipe = (direction, id) => {
     console.log(`Swiped ${direction} on card ${id}`);
     setCards(cards.filter(card => card.id !== id));
@@ -108,6 +112,7 @@ const ImageSwiper = () => {
             card={card}
             onSwipe={(direction) => handleSwipe(direction, card.id)}
             setLastSwipe={setLastSwipe}
+            navbarHeight={navbarHeight} // Pass navbar height to the card component
           />
         ))}
         {cards.length === 0 && <p>No more cards!</p>}

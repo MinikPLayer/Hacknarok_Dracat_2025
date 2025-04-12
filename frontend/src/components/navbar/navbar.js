@@ -96,8 +96,8 @@ useEffect(() => {
                                 </>
                                 :
                                 <>
-                                    <Nav.Link href="/jobs" className="text-white">Prace</Nav.Link>
-                                    <Nav.Link href="/trading" className="text-white">Market</Nav.Link>
+                                    {/*<Nav.Link href="/jobs" className="text-white">Prace</Nav.Link>*/}
+                                    {/*<Nav.Link href="/trading" className="text-white">Market</Nav.Link>*/}
                                     {/*<NavDropdown title="Planowanie">*/}
                                     {/*    <NavDropdown.Item href="/calendar">Kalendarz</NavDropdown.Item>*/}
                                     {/*    <NavDropdown.Item href="/localizations">*/}
