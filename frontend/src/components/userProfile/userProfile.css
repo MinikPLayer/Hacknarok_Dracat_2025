@@ -1,0 +1,220 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .profile-columns {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .left-column {
+    flex: 1;
+    max-width: 300px;
+  }
+  
+  .right-column {
+    flex: 2;
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+  }
+  
+  .button-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .achievements {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .statistics-section {
+    margin-top: 20px;
+  }
+  
+  .chart-container {
+    margin-bottom: 30px;
+  }
+
+  /* Ogólne style */
+.profile-container {
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .profile-header h2 {
+    font-size: 1.8rem;
+    color: #333;
+  }
+  
+  .divider {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 20px 0;
+  }
+  
+  /* Ikony osiągnięć */
+  .achievements {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .achievement-icon {
+    transition: transform 0.3s, color 0.3s;
+    cursor: pointer;
+  }
+  
+  .achievement-icon:hover {
+    transform: scale(1.2);
+    color: #ff9800;
+  }
+  
+  /* Bio */
+  .bio-text-editable {
+    width: 100%;
+    min-height: 80px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    resize: none;
+    background: #fff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .bio-text-editable:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Wykresy */
+  .chart-container {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-container h4 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #555;
+  }
+
+  .challenge-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .challenge-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Sekcja znajomych */
+.friends-section {
+    margin-top: 20px;
+  }
+  
+  .friends-section h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .friends-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .friend-item {
+    padding: 5px 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .add-friend {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .add-friend-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .add-friend-button {
+    padding: 8px 15px;
+    font-size: 1rem;
+    color: #fff;
+    background: linear-gradient(135deg, #4caf50, #81c784);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .add-friend-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Przycisk kopiowania linku */
+.copy-link-button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    color: #fff;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .copy-link-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
