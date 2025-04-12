@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { isUserAuthenticated } from "../../AuthContext";
 import { Navigate } from 'react-router-dom';
+import './mainModule.css'
 
 const Main = () => {
     const [groups, setGroups] = useState([]);
@@ -9,30 +10,6 @@ const Main = () => {
     const [lastTrip, setLastTrip] = useState(null); // Informacje o ostatniej podróży
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (isUserAuthenticated()) {
-            // Przykładowe dane
-            setGroups([
-                { id: 1, name: 'Group 1' },
-                { id: 2, name: 'Group 2' },
-                { id: 3, name: 'Group 3' }
-            ]);
-            setCalendarEvents([
-                { id: 1, date: '2025-03-25', name: 'Event 1' },
-                { id: 2, date: '2025-03-26', name: 'Event 2' }
-            ]);
-            setRecommendations([
-                { id: 1, title: 'Recommendation 1' },
-                { id: 2, title: 'Recommendation 2' }
-            ]);
-            setLastTrip({
-                destination: 'Paris',
-                date: '2025-03-20',
-                description: 'A wonderful trip to Paris with friends.'
-            });
-            setLoading(false);
-        }
-    }, []);
 
     if (!isUserAuthenticated()) {
         // Redirect to login page if no token exists
