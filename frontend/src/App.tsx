@@ -5,14 +5,14 @@ import Homepage from "./components/homepage/homepage";
 import Login from "./components/login/login";
 import CustomNavbar from "./components/navbar/navbar";
 import Footer from "./components/footer/footer";
-import {useContext} from "react";
 import Register from "./components/register/register";
 import Logout from "./components/logout/logout";
 import Main from "./components/main/main";
-import UserProfile from "./components/userProfile/userProfile";
 import {AuthProvider} from "./AuthContext";
+import UserProfile from './components/userProfile/userProfile';
 import MapWithPins from "./components/mapWithPins/mapWithPins";
 import ImageSwiper from "./components/imageSwiper/imageSwiper";
+import Notifications from "./components/notifications/notifications"
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
                 <div className="background-main min-vh-100">
                     <Routes>
                         <Route path="/" element={<Homepage/>}/>
-                        <Route path="/userProfile" element={<UserProfile/>}/>
+                        <Route path="/userProfile" element={<UserProfile isOwnProfile={true}/>}/>
 
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Register/>}/>
@@ -33,6 +33,7 @@ function App() {
                         <Route path="/main" element={<Main/>}/>
                         <Route path="/map" element={<MapWithPins/>}/>
                         <Route path="/swiper" element={<ImageSwiper/>}/>
+                        <Route path="/notifications" element={<Notifications/>}/>
 
                     </Routes>
                 </div>
