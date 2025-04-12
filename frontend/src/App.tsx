@@ -11,6 +11,8 @@ import Logout from "./components/logout/logout";
 import Main from "./components/main/main";
 import UserProfile from "./components/userProfile/userProfile";
 import {AuthProvider} from "./AuthContext";
+import MapWithPins from "./components/mapWithPins/mapWithPins";
+import ImageSwiper from "./components/imageSwiper/imageSwiper";
 
 function App() {
   return (
@@ -29,6 +31,9 @@ function App() {
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/logout" element={<Logout/>}/>
                         <Route path="/main" element={<Main/>}/>
+                        <Route path="/map" element={<MapWithPins/>}/>
+                        <Route path="/swiper" element={<ImageSwiper/>}/>
+
                     </Routes>
                 </div>
                 {/* Routes */}

@@ -89,8 +89,6 @@ useEffect(() => {
                             }
 
 
-                            {/*<Nav.Link as={Link} to="/manage" className="text-white">Zarządzaj</Nav.Link>*/}
-
                             {!isAuthenticated ?
                                 <>
                                     <Nav.Link href="/about" className="text-white">O nas</Nav.Link>
@@ -98,26 +96,15 @@ useEffect(() => {
                                 </>
                                 :
                                 <>
-                                    <Nav.Link href="/actual-info" className="text-white">Aktualności</Nav.Link>
-                                    <Nav.Link href="/pierogi" className="text-white">Rekrutacja</Nav.Link>
-                                    <NavDropdown title="Planowanie">
-                                        <NavDropdown.Item href="/calendar">Kalendarz</NavDropdown.Item>
-                                        <NavDropdown.Item href="/localizations">
-                                          Lokalizacje
-                                        </NavDropdown.Item>
-                                    </NavDropdown>
+                                    <Nav.Link href="/jobs" className="text-white">Prace</Nav.Link>
+                                    <Nav.Link href="/trading" className="text-white">Market</Nav.Link>
+                                    {/*<NavDropdown title="Planowanie">*/}
+                                    {/*    <NavDropdown.Item href="/calendar">Kalendarz</NavDropdown.Item>*/}
+                                    {/*    <NavDropdown.Item href="/localizations">*/}
+                                    {/*      Lokalizacje*/}
+                                    {/*    </NavDropdown.Item>*/}
+                                    {/*</NavDropdown>*/}
 
-                                    <NavDropdown title="Społeczność">
-                                        <NavDropdown.Item href="/groups">Grupy</NavDropdown.Item>
-                                        <NavDropdown.Item href="/exchanges">
-                                          Wymiany
-                                        </NavDropdown.Item>
-                                        <NavDropdown.Item href="/forum">
-                                          Forum
-                                        </NavDropdown.Item>
-                                    </NavDropdown>
-
-                                    <Nav.Link href="/learning" className="text-white">Nauka</Nav.Link>
                                     <Nav.Link href="/notifications" className="text-white">
                                         <Badge badgeContent={4} color="primary">
                                           <CircleNotificationsRoundedIcon/>
