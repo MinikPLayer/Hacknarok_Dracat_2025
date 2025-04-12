@@ -1,9 +1,11 @@
 // RankingPage.tsx
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { isUserAuthenticated } from "../../AuthContext";
 import { Navigate } from 'react-router-dom';
 import './ranking.css';
 import { FaTrophy, FaMedal, FaUserAlt, FaGlobeAmericas, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import {API_BASE_URL} from "../../config";
+import client from "../../client";
 
 interface UserRanking {
   id: number;
@@ -41,10 +43,16 @@ const RankingPage = () => {
 
   // Znajdź aktualnego użytkownika (w rzeczywistej aplikacji dane będą pobierane z kontekstu/API)
   const currentUser = allUsers.find(user => user.id === 4); // Przykładowe ID
+  const token = localStorage.getItem("access")
+  const [user, setUser] = useState({});
+
 
   if (!isUserAuthenticated()) {
     return <Navigate to="/login" />;
   }
+
+
+
 
   // Grupuj użytkowników według poziomów
   const usersByLevel: Record<number, UserRanking[]> = {};
@@ -71,6 +79,27 @@ const RankingPage = () => {
         : [...prev, level]
     );
   };
+
+  useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await client.get(API_BASE_URL + "user/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setUser(response.data);
+                console.log("Zalogowano");
+                console.log(response.data);
+            } catch (error) {
+                console.log("Nie udało się zalogować");
+            }
+        };
+
+        if (token) {
+            fetchUserData();
+        }
+    }, [token]);
 
   return (
     <div className="ranking-container">

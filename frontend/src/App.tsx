@@ -15,7 +15,10 @@ import ImageSwiper from "./components/imageSwiper/imageSwiper";
 import Notifications from "./components/notifications/notifications"
 import FormModule from './components/form/formModule';
 import FeedbackForm from "./components/feedbackForm/feedbackForm";
+
 import RankingPage from './components/ranking/ranking';
+import LlamaChat from "./components/llamaChat/llamaChat";
+
 
 function App() {
   return (
@@ -40,6 +43,8 @@ function App() {
                         <Route path="/form" element={<FormModule/>}/>
                         <Route path="/feedback" element={<FeedbackForm/>}/>
                         <Route path="/ranking" element={<RankingPage/>}/>
+                        <Route path="/chat" element={<LlamaChat/>}/>
+
 
                     </Routes>
                 </div>

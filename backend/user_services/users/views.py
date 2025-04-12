@@ -1,6 +1,7 @@
-from django.shortcuts import render
-import json
-import urllib.parse
+
+import requests
+
+from rest_framework.response import Response
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
@@ -8,17 +9,13 @@ from django.contrib.auth import get_user_model
 # Create your views here.
 from rest_framework import permissions, status
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
-from rest_framework.views import APIView
+
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import AppUser
 from users.serializers import UserRegisterSerializer, UserSerializer
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
+
 
 
 
@@ -124,20 +121,34 @@ class OneUserData(APIView):
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .llama_model import generate_response
-
 class LlamaGenerateView(APIView):
     def post(self, request):
-        prompt = request.data.get("prompt", "")
-        if not prompt:
-            return Response({"error": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST)
+        # Hardcoded reviews (you can change these to any fixed set of reviews)
+        reviews = {
+            "review_1": "Bardzo dobre jedzenie, szybka obsługa.",
+            "review_2": "Kelner był niemiły, ale jedzenie smaczne.",
+            "review_3": "Świetna atmosfera i wystrój, wrócę na pewno!"
+        }
+
+        # Sklej wszystkie recenzje do jednego tekstu
+        combined_reviews = "\n".join(f"- {text}" for text in reviews.values())
+
+        # Prompt do Mistrala
+        prompt = f"""Przeczytaj poniższe recenzje klientów i stwórz ich krótkie podsumowanie (2-3 zdania):
+    {combined_reviews}
+    """
 
         try:
-            response = generate_response(prompt)
-            return Response({"response": response})
+            res = requests.post(
+                "http://localhost:11434/api/generate",  # Mistral model endpoint
+                json={
+                    "model": "mistral",
+                    "prompt": prompt,
+                    "stream": False
+                }
+            )
+            res.raise_for_status()
+            data = res.json()
+            return Response({"response": data.get("response", "").strip()})
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

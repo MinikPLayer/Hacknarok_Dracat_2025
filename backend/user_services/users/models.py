@@ -44,6 +44,7 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     surname = models.CharField(max_length=200,blank=True, null=True)
     profile_picture = models.ImageField(blank=True, null=True, upload_to="images")
     is_verified = models.BooleanField(default=False)
+    friends = models.ManyToManyField('self', blank=True, symmetrical=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     objects = AppUserManager()

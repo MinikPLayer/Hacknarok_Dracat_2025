@@ -2,6 +2,8 @@ from . import views
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from .views import LlamaGenerateView
+
 urlpatterns = [
     path('register/', views.UserRegister.as_view(), name='register'),
     path('login/', views.UserLogin.as_view(), name='login'),
