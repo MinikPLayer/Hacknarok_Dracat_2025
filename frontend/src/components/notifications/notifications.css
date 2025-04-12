@@ -1,0 +1,18 @@
+/* Custom styling for the DateTimePicker */
+.custom-datetime-picker {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 16px;
+  background-color: #f8f9fa;
+}
+
+.custom-datetime-picker:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.custom-datetime-picker .react-datetime-picker__wrapper {
+  border-radius: 5px;
+}

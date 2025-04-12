@@ -12,6 +12,7 @@ import {AuthProvider} from "./AuthContext";
 import UserProfile from './components/userProfile/userProfile';
 import MapWithPins from "./components/mapWithPins/mapWithPins";
 import ImageSwiper from "./components/imageSwiper/imageSwiper";
+import Notifications from "./components/notifications/notifications"
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
                         <Route path="/main" element={<Main/>}/>
                         <Route path="/map" element={<MapWithPins/>}/>
                         <Route path="/swiper" element={<ImageSwiper/>}/>
+                        <Route path="/notifications" element={<Notifications/>}/>
 
                     </Routes>
                 </div>

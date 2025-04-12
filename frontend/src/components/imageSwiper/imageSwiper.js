@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useGesture } from 'react-use-gesture';
+import {Box, Button, Typography} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -64,8 +66,8 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight }) => {
         transform: `translate3d(${position.x}px, ${position.y}px, 0) rotate(${rotation}deg)`,
         transition: isLeaving ? 'all 0.3s ease' : 'none',
         position: 'absolute',
-        width: '300px',
-        height: '400px',
+        width: '90vw', // Set the width to 90% of the viewport width
+        height: '80vh', // Set the height to 80% of the viewport height
         backgroundColor: '#fff',
         borderRadius: '15px',
         boxShadow: '0 10px 20px rgba(0,0,0,0.19)',
@@ -75,13 +77,9 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight }) => {
       }}
     >
       <div style={{ padding: '20px' }}>
+        <img src={"https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRLM_YMOn41npXKC5fX-TSRfe20jO-nK1cfON36eskj5100UzlH4JMmJVsjNYxZPV4R0vw6DHIw0dqN-osUB5Iw7Q"}/>
         <h2>{card.name}</h2>
         <p>{card.description}</p>
-        <div style={{ position: 'absolute', bottom: '20px', width: '100%' }}>
-          <button onClick={() => { setLastSwipe('left'); handleSwipe('left'); }}>👎</button>
-          <button onClick={() => { setLastSwipe('up'); handleSwipe('up'); }}>⭐</button>
-          <button onClick={() => { setLastSwipe('right'); handleSwipe('right'); }}>👍</button>
-        </div>
       </div>
     </div>
   );
@@ -95,7 +93,8 @@ const ImageSwiper = () => {
   ]);
   const [lastSwipe, setLastSwipe] = useState(null); // Track last swipe globally
 
-  const navbarHeight = 60; // Assuming navbar height is 60px (adjust based on actual navbar height)
+  const navbarHeight = 140; // Assuming navbar height is 60px (adjust based on actual navbar height)
+  const navigate = useNavigate();
 
   const handleSwipe = (direction, id) => {
     console.log(`Swiped ${direction} on card ${id}`);
@@ -103,9 +102,9 @@ const ImageSwiper = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ justifyContent: 'center', marginTop: '110px', flexDirection: 'column', alignItems: 'center' }}>
       {/* Card Stack */}
-      <div style={{ position: 'relative', height: '450px', width: '300px' }}>
+      <div style={{ position: 'relative', margin: "auto", height: '70vh', width: '90vw' }}>
         {cards.map((card) => (
           <TinderCard
             key={card.id}
@@ -115,7 +114,20 @@ const ImageSwiper = () => {
             navbarHeight={navbarHeight} // Pass navbar height to the card component
           />
         ))}
-        {cards.length === 0 && <p>No more cards!</p>}
+        {cards.length === 0 &&
+            <>
+              <Box>
+                <Typography>
+                    Twoje 9 światów zostało wybranych!
+                </Typography>
+                <Box>
+                  <Button onClick={() => {navigate("/map")}} style={{ margin: 20}} variant={"contained"}> Przejdź do mapy</Button>
+                </Box>
+
+              </Box>
+            </>
+
+        }
       </div>
 
       {/* Swipe Direction Text */}
