@@ -3,7 +3,6 @@ import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import "./navbar.css"
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import {AuthContext} from "../../AuthContext";
 import {LogoutRounded} from "@mui/icons-material";
 import client from "../../client";
@@ -23,11 +22,11 @@ const CustomNavbar = () => {
 
 useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 992); // You can adjust the threshold as needed
+      setIsSmallScreen(window.innerWidth < 992); 
     };
 
     window.addEventListener('resize', handleResize);
-    handleResize(); // Set initial state
+    handleResize(); 
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -72,11 +71,11 @@ useEffect(() => {
     return (
         <div>
             {/* Navbar */}
-            <Navbar expand="lg" variant="dark" className="shadow-sm"  style={{ backgroundColor: "black"}}>
+            <Navbar expand="lg" variant="dark" className="shadow-sm"  style={{ backgroundColor: "#0F7201FF" }}>
                 <Container>
                     <Navbar.Brand className="text-primary fw-bold">
                         <Nav.Link href="/">
-                            <img style={{display: "inline", marginRight: 10}} width={50} src={"/icons/kitty.ico"}/>
+                            <img style={{display: "inline", marginRight: 10}} width={50} alt ="catIcon" src={"media/kotelIcon.png"}/>
                         </Nav.Link>
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls=" basic-navbar-nav"/>
