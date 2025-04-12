@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { isUserAuthenticated } from "../../AuthContext";
 import { Navigate } from 'react-router-dom';
-import './mainModule.css'
 
 const Main = () => {
     const [groups, setGroups] = useState([]);
