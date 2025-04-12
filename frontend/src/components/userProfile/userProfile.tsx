@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import './userProfile.css';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { FaMedal, FaTrophy, FaStar, FaCrown } from 'react-icons/fa';
 import client from '../../client'; 
 import { API_BASE_URL } from '../../config'; 
-import { Avatar } from "@mui/material";
+import {Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
 import QRCode from "react-qr-code";
+import Cropper from "react-easy-crop";
+import {FaPencil} from "react-icons/fa6";
 
 interface UserData {
   id?: string;
@@ -27,13 +29,100 @@ interface GenreData {
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+// @ts-ignore
+async function getCroppedImg(imageSrc, croppedAreaPixels) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.src = imageSrc;
+        image.crossOrigin = "anonymous";
 
+        image.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            canvas.width = croppedAreaPixels.width;
+            canvas.height = croppedAreaPixels.height;
+
+            // @ts-ignore
+          ctx.drawImage(
+                image,
+                croppedAreaPixels.x, croppedAreaPixels.y,
+                croppedAreaPixels.width, croppedAreaPixels.height,
+                0, 0,
+                canvas.width, canvas.height
+            );
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    return reject(new Error("Błąd konwersji obrazu"));
+                }
+                resolve(blob);
+            }, "image/png");
+        };
+
+        image.onerror = (error) => reject(error);
+    });
+}
 const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [profileImage, setProfileImage] = useState<string>('/images/basic/user_no_picture.png');
   const [friends, setFriends] = useState<string[]>(['Jan Kowalski', 'Anna Nowak', 'Piotr Zieliński']);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [qrCodeValue, setQrCodeValue] = useState('');
+  const [user, setUser] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [crop, setCrop] = useState({x: 0, y: 0});
+  const [zoom, setZoom] = useState(1);
+  const [croppedImage, setCroppedImage] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+
+  // Dodaj te nowe funkcje
+  // @ts-ignore
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  // @ts-ignore
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // @ts-ignore
+        setImageSrc(reader.result);
+        setShowCropModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCropSave = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+
+    try {
+      const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const formData = new FormData();
+      // @ts-ignore
+      formData.append("profile_picture", croppedBlob);
+
+      const response = await client.post(`${API_BASE_URL}user/`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access')}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const newImage = response.data.profile_picture;
+      setProfileImage(newImage);
+      localStorage.setItem('profile_picture', newImage);
+      setShowCropModal(false);
+    } catch (error) {
+      console.error('Błąd podczas aktualizacji avatara:', error);
+    }
+  };
 
   // Mock data
   const monthlyVisits: VisitData[] = [
@@ -118,22 +207,47 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
         {/* Left Column - Profile Info */}
         <div className="left-column">
           <div className="profile-header">
-            <Avatar 
-              src={profileImage} 
-              sx={{ 
-                width: isSmallScreen ? 60 : 80, 
-                height: isSmallScreen ? 60 : 80 
-              }}
-            />
-            <div className="profile-info">
-              <h2 className="name">{userData?.name || 'Katarzyna Wójcik'}</h2>
-              <p className="rank-title">
-                {userData?.rank || '7'}
-                <br />
-                {userData?.title || 'Ekspert podróży'}
-              </p>
+            <div
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              style={{ position: 'relative' }}
+            >
+              <Avatar
+                src={profileImage}
+                sx={{
+                  width: isSmallScreen ? 60 : 80,
+                  height: isSmallScreen ? 60 : 80,
+                  filter: hover ? 'brightness(0.8)' : 'none',
+                  transition: 'filter 0.3s'
+                }}
+              />
+              {hover && isOwnProfile && (
+                <>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() =>
+                        // @ts-ignore
+                        document.getElementById('avatarInput').click()
+                  }
+                  >
+                    <FaPencil style={{ color: 'white', fontSize: '24px' }} />
+                  </div>
+                  <input
+                    id="avatarInput"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleImageUpload}
+                  />
+                </>
+              )}
             </div>
-          </div>
 
           <hr className="divider" />
 
@@ -227,8 +341,70 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
               </ResponsiveContainer>
             </div>
           </div>
+
+          <Dialog
+        open={showCropModal}
+        onClose={() => setShowCropModal(false)}
+        PaperProps={{
+          sx: {
+            width: '90%',
+            maxWidth: '600px',
+            borderRadius: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          typography: 'h6',
+          bgcolor: 'background.default',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}>
+          Edycja zdjęcia profilowego
+        </DialogTitle>
+
+        <DialogContent sx={{
+          position: 'relative',
+          height: '400px',
+          bgcolor: 'background.paper'
+        }}>
+          {imageSrc && (
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+              cropShape="round"
+              showGrid={false}
+            />
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{
+          bgcolor: 'background.default',
+          borderTop: '1px solid',
+          borderColor: 'divider'
+        }}>
+          <Button
+            onClick={() => setShowCropModal(false)}
+            color="inherit"
+          >
+            Anuluj
+          </Button>
+          <Button
+            onClick={handleCropSave}
+            variant="contained"
+            disableElevation
+          >
+            Zapisz zmiany
+          </Button>
+        </DialogActions>
+      </Dialog>
         </div>
       </div>
+    </div>
     </div>
   );
 };

@@ -80,6 +80,8 @@ const RankingPage = () => {
     );
   };
 
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
         const fetchUserData = async () => {
             try {
