@@ -3,11 +3,11 @@ import 'package:dracat_hacknarok_2025/model/location_model.dart';
 class TripModel {
   List<LocationModel> points = [];
 
-  String? name;
+  String name;
 
   TripModel({
     required this.points,
-    this.name,
+    required this.name,
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) {
@@ -15,7 +15,7 @@ class TripModel {
       points:
           (json['points'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e as Map<String, dynamic>)).toList() ??
               [],
-      name: json['name'] as String?,
+      name: json['name'] as String,
     );
   }
 

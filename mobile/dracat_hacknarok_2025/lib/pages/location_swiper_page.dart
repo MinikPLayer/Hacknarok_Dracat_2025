@@ -7,7 +7,9 @@ import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class LocationSwiperCardEntry {
   final LocationModel location;
@@ -30,6 +32,7 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
   bool isFinished = false;
   final ConfettiController confettiController = ConfettiController(duration: const Duration(seconds: 1));
   final ConfettiController confettiController2 = ConfettiController(duration: const Duration(seconds: 1));
+  final TextEditingController tripNamecontroller = TextEditingController();
 
   List<LocationSwiperCardEntry> selectedEntries = [];
 
@@ -93,6 +96,20 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
                         ),
                       ),
                       Padding(
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                        child: TextField(
+                          controller: tripNamecontroller,
+                          decoration: InputDecoration(
+                            labelText: "Trip name",
+                            hintText: "Enter a name for your trip",
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (value) {
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      Padding(
                         padding: const EdgeInsets.only(bottom: 40.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
@@ -116,7 +133,7 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: null,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -129,18 +146,21 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {
-                                var tripData = TripModel(
-                                  points: selectedEntries.map((entry) => entry.location).toList(),
-                                );
-                                Provider.of<MockTripProvider>(context, listen: false).setActiveTrip(tripData);
-                                Navigator.of(context).popUntil((route) => route.isFirst);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => MapPage(),
-                                  ),
-                                );
-                              },
+                              onPressed: tripNamecontroller.text.isEmpty
+                                  ? null
+                                  : () {
+                                      var tripData = TripModel(
+                                        points: selectedEntries.map((entry) => entry.location).toList(),
+                                        name: tripNamecontroller.text,
+                                      );
+                                      Provider.of<MockTripProvider>(context, listen: false).setActiveTrip(tripData);
+                                      Navigator.of(context).popUntil((route) => route.isFirst);
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => MapPage(),
+                                        ),
+                                      );
+                                    },
                               child: Row(
                                 children: [
                                   Text("Continue"),
@@ -252,6 +272,13 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
 
           provider.refreshLocations();
           return;
+        }
+
+        if (tripNamecontroller.text.isEmpty) {
+          DateFormat dateTimeFormat = DateFormat.yMEd(Localizations.localeOf(context).toString());
+          DateTime dt = DateTime.now();
+          String dateString = dateTimeFormat.format(dt);
+          tripNamecontroller.text = "Trip $dateString";
         }
 
         isFinished = true;

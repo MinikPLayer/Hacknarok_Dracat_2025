@@ -5,6 +5,7 @@ import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
