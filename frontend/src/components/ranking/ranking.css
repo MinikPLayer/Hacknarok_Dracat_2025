@@ -1,0 +1,442 @@
+/* ranking.css */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --gold-color: #ffd700;
+    --silver-color: #c0c0c0;
+    --bronze-color: #cd7f32;
+    --text-color: #2c3e50;
+    --light-text: #7f8c8d;
+    --border-color: #e0e0e0;
+    --background-light: #f9f9f9;
+    --current-user-bg: #e3f2fd;
+    --level-active-bg: #e8f4f8;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+  
+  .ranking-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .ranking-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .ranking-header h1 {
+    font-size: 2.2rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .ranking-header p {
+    color: var(--light-text);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  
+  /* Level selector styles */
+  .level-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+  
+  .level-filter {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+  }
+  
+  .level-filter:hover {
+    background: var(--background-light);
+  }
+  
+  .level-filter.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
+  /* Podium styles */
+  .podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 6rem;
+  }
+  
+  .podium-item {
+    flex: 1;
+    max-width: 200px;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: var(--transition);
+  }
+  
+  .podium-item.gold {
+    height: 220px;
+    border-top: 4px solid var(--gold-color);
+  }
+  
+  .podium-item.silver {
+    height: 180px;
+    border-top: 4px solid var(--silver-color);
+  }
+  
+  .podium-item.bronze {
+    height: 160px;
+    border-top: 4px solid var(--bronze-color);
+  }
+  
+  .podium-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .podium-rank span {
+    color: var(--text-color);
+  }
+  
+  .gold-medal {
+    color: var(--gold-color);
+    font-size: 1.5rem;
+  }
+  
+  .silver-medal {
+    color: var(--silver-color);
+    font-size: 1.5rem;
+  }
+  
+  .bronze-medal {
+    color: var(--bronze-color);
+    font-size: 1.5rem;
+  }
+  
+  .podium-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background-color: var(--background-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .podium-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .default-avatar {
+    font-size: 2.5rem;
+    color: var(--light-text);
+  }
+  
+  .podium-details h3 {
+    margin: 0 0 0.5rem;
+    color: var(--text-color);
+    font-size: 1.1rem;
+  }
+  
+  .podium-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    color: var(--light-text);
+  }
+  
+  .podium-stats span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+  
+  /* Levels ranking styles */
+  .levels-ranking {
+    margin-bottom: 2rem;
+  }
+  
+  .level-group {
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  
+  .level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    background-color: var(--background-light);
+  }
+  
+  .level-header:hover {
+    background-color: var(--level-active-bg);
+  }
+  
+  .level-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .users-count {
+    font-size: 0.9rem;
+    color: var(--light-text);
+    font-weight: normal;
+  }
+  
+  .toggle-icon {
+    color: var(--light-text);
+    transition: var(--transition);
+  }
+  
+  /* Ranking list styles */
+  .ranking-list {
+    background: white;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+  }
+  
+  .ranking-list-header {
+    display: grid;
+    grid-template-columns: 50px 2fr 1fr 1fr;
+    padding: 1rem 1.5rem;
+    background-color: var(--background-light);
+    font-weight: bold;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .ranking-item {
+    display: grid;
+    grid-template-columns: 50px 2fr 1fr 1fr;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+  }
+  
+  .ranking-item:last-child {
+    border-bottom: none;
+  }
+  
+  .ranking-item:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .ranking-item.current-user {
+    background-color: var(--current-user-bg);
+    font-weight: 500;
+  }
+  
+  .rank-number {
+    font-weight: bold;
+    color: var(--text-color);
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--background-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .visited-places, .user-points {
+    text-align: right;
+    color: var(--text-color);
+  }
+  
+  .user-points {
+    font-weight: bold;
+  }
+  
+  /* User stats card */
+  .user-stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  
+  .user-stats-card h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .user-stats-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .user-rank {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    min-width: 80px;
+  }
+  
+  .user-level {
+    font-size: 1rem;
+    color: var(--light-text);
+    font-weight: normal;
+  }
+  
+  .user-details {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-grow: 1;
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--background-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .user-info h4 {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    color: var(--text-color);
+  }
+  
+  .stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--light-text);
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .ranking-container {
+      padding: 1rem;
+    }
+  
+    .podium-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    
+    }
+  
+    .podium-item {
+      width: 100%;
+      max-width: 300px;
+      height: auto !important;
+      padding: 1rem;
+    }
+  
+    .ranking-list-header, .ranking-item {
+      grid-template-columns: 40px 2fr 1fr 1fr;
+      padding: 0.8rem 1rem;
+    }
+  
+    .user-stats-content {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  
+    .user-details {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .ranking-header h1 {
+      font-size: 1.8rem;
+    }
+  
+    .level-selector {
+      gap: 0.3rem;
+    }
+  
+    .level-filter {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+  
+    .ranking-list-header, .ranking-item {
+      grid-template-columns: 30px 2fr 1fr;
+    }
+  
+    .ranking-list-header span:nth-child(4),
+    .ranking-item .user-points {
+      display: none;
+    }
+  }
