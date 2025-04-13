@@ -98,6 +98,19 @@ class MockTripProvider extends ChangeNotifier {
     var tripData = await MapUtils.getTripBetweenPoints(points.map((e) => e.getLocation()).toList());
     _activeTripData = ActiveTripData(activeTrip: trip, waypoints: tripData.waypoints, routes: tripData.routes);
 
+    for (var p in trip.visitedPointsList) {
+      var activeTripDataPoints = _activeTripData!.waypoints.toList();
+      activeTripDataPoints.sort((x1, x2) {
+        var distance1 = Distance().as(LengthUnit.Meter, x1.location, p.getLocation());
+        var distance2 = Distance().as(LengthUnit.Meter, x2.location, p.getLocation());
+
+        return distance1.compareTo(distance2);
+      });
+
+      var first = activeTripDataPoints[0];
+      first.isVisited = true;
+    }
+
     notifyListeners();
   }
 
@@ -128,8 +141,8 @@ class MockTripProvider extends ChangeNotifier {
     // _activeTripData = null;
     // updateActiveTripData(trip, userLocation);
     // Remove the point from the list of active trip data
-
-    _activeTripData?.waypoints.removeWhere((point) => point.location == waypoint.location);
+    // _activeTripData?.waypoints.removeWhere((point) => point.location == waypoint.location);
+    waypoint.isVisited = true;
 
     if (trip.points.length <= trip.visitedPointsList.length) {
       finishActiveTrip();

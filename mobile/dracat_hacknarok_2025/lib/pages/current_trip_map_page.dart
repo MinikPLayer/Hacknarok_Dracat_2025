@@ -42,19 +42,18 @@ class _MapComponentState extends State<MapPage> {
       return Colors.blue;
     }
 
-    // switch (index) {
-    //   case 0:
-    //     return nearestColor;
-    //   case 1:
-    //     return secondColor;
-    //   default:
-    //     return thirdColor;
-    // }
+    Color color;
     if (waypoint.location == nearestWaypoint?.location) {
-      return nearestColor;
+      color = nearestColor;
     } else {
-      return thirdColor;
+      color = thirdColor;
     }
+
+    if (waypoint.isVisited) {
+      color = color.withAlpha(96);
+    }
+
+    return color;
   }
 
   // TODO: Fix click being blocked by map overlays.
@@ -121,7 +120,7 @@ class _MapComponentState extends State<MapPage> {
                   size: iconSize,
                   shadows: [
                     Shadow(
-                      color: Colors.black.withAlpha(196),
+                      color: Colors.black.withAlpha(landmark.isVisited ? 32 : 196),
                       offset: const Offset(1, 1),
                       blurRadius: 1.0,
                     ),
@@ -161,11 +160,15 @@ class _MapComponentState extends State<MapPage> {
     });
   }
 
-  OSRMWaypoint getNearestWaypoint(LatLng userPosition, List<OSRMWaypoint> waypoints) {
-    var nearestWaypoint = waypoints[0];
+  OSRMWaypoint getNearestNotVisitedWaypoint(LatLng userPosition, List<OSRMWaypoint> waypoints) {
+    var nearestWaypoint = waypoints.firstWhere((waypoint) => !waypoint.isVisited);
     var nearestDistance = Distance().as(LengthUnit.Meter, userPosition, nearestWaypoint.location);
 
     for (var waypoint in waypoints) {
+      if (waypoint.isVisited) {
+        continue;
+      }
+
       var distance = Distance().as(LengthUnit.Meter, userPosition, waypoint.location);
       if (distance < nearestDistance) {
         nearestDistance = distance;
@@ -185,7 +188,7 @@ class _MapComponentState extends State<MapPage> {
         DateTime.now().difference(lastWaypointUpdate).inSeconds > waypointUpdateInterval.inSeconds) {
       print("Updating nearest waypoint and route...");
       nearestWaypointUpdateInProgress = true;
-      var nearest = getNearestWaypoint(userLocation, waypoints);
+      var nearest = getNearestNotVisitedWaypoint(userLocation, waypoints);
       setState(() {
         nearestWaypoint = nearest;
       });
@@ -207,6 +210,10 @@ class _MapComponentState extends State<MapPage> {
     }
 
     for (var waypoint in waypoints) {
+      if (waypoint.isVisited) {
+        continue;
+      }
+
       var distance = Distance().as(LengthUnit.Meter, userPosition, waypoint.location);
       if (distance < minAutoVisitDistance) {
         setState(() {

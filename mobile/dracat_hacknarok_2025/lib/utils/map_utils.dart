@@ -90,8 +90,15 @@ class OSRMWaypoint {
   num? distance;
   num? waypointIndex;
 
+  bool isVisited = false;
+
   OSRMWaypoint(
-      {required this.location, required this.name, required this.hint, required this.distance, this.waypointIndex});
+      {required this.location,
+      required this.name,
+      required this.hint,
+      required this.distance,
+      this.waypointIndex,
+      this.isVisited = false});
 
   factory OSRMWaypoint.fromJson(Map<String, dynamic> json) {
     return OSRMWaypoint(
