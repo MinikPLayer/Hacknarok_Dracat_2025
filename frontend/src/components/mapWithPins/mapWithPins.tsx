@@ -3,10 +3,10 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngExpression, Map as LeafletMap, DivIcon, Icon } from 'leaflet';
 import { Box, Typography, Button } from "@mui/material";
-import { Feature, LineString, Point } from 'geojson'; // For OSRM response typing
+import { Feature, LineString, Point } from 'geojson';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconShadowUrl from 'leaflet/dist/images/marker-shadow.png';
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { NavigateFunction, useNavigate, useLocation } from "react-router-dom";
 
 interface Coordinates {
     latitude: number;
@@ -17,6 +17,7 @@ interface LocationData extends Coordinates {
     id: number;
     name: string;
     description: string;
+    icon?: string;
 }
 
 type MarkerType = 'route' | 'user' | 'default';
@@ -71,6 +72,11 @@ interface OSRMTripResponse {
     waypoints: any[];
 }
 
+interface TripData {
+    locations: LocationData[];
+    routeOptions?: any;
+}
+
 const createQuestionIcon = (): DivIcon => new L.DivIcon({
     html: '<div style="font-size: 24px; color: #1976d2;">❓</div>',
     className: '',
@@ -96,14 +102,19 @@ const createUserIcon = (): DivIcon => new L.DivIcon({
     popupAnchor: [0, -24],
 });
 
+const createCustomIcon = (icon: string, color: string = '#1976d2'): DivIcon => new L.DivIcon({
+    html: `<div style="font-size: 24px; background-color: "black"; color: ${color};">${icon}</div>`,
+    className: '',
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -24],
+});
 
 interface ChangeMapCenterProps {
     center: LatLngExpression | null;
 }
 
-
 const ChangeMapCenter: FC<ChangeMapCenterProps> = ({ center }) => {
-    const navigate = useNavigate();
     const map = useMap();
     useEffect(() => {
         if (center) {
@@ -113,7 +124,11 @@ const ChangeMapCenter: FC<ChangeMapCenterProps> = ({ center }) => {
     return null;
 };
 
-const getLocationMarkerIcon = (type: MarkerType): DivIcon | Icon => {
+const getLocationMarkerIcon = (type: MarkerType, customIcon?: string): DivIcon | Icon => {
+    if (customIcon) {
+        return createCustomIcon(customIcon);
+    }
+
     switch (type) {
         case 'route':
             return createRouteIcon();
@@ -128,9 +143,8 @@ interface LocationMarkerProps {
     location: Coordinates & { name?: string; description?: string };
     type: MarkerType;
     onClick?: (location: Coordinates) => void;
+    icon?: string;
 }
-
-// ... importy i ikony takie jak wcześniej (bez zmian)
 
 const exampleLocations: LocationData[] = [
     { id: 1, name: "Budynek A", latitude: 50.0645, longitude: 19.9234, description: "A-0" },
@@ -140,9 +154,9 @@ const exampleLocations: LocationData[] = [
 
 const userLocation: Coordinates = { latitude: 50.0745, longitude: 19.9234 };
 
-const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) => {
+const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick, icon }) => {
     const position: LatLngExpression = [location.latitude, location.longitude];
-
+    const navigate = useNavigate()
     const handleClick = () => {
         if (onClick) {
             onClick(location);
@@ -152,7 +166,7 @@ const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) =>
     return (
         <Marker
             position={position}
-            icon={getLocationMarkerIcon(type)}
+            icon={getLocationMarkerIcon(type, icon)}
             eventHandlers={{ click: handleClick }}
         >
             {(location.name || location.description || type === 'route') && (
@@ -161,14 +175,13 @@ const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) =>
                     {location.description && <Typography variant="body2">{location.description}</Typography>}
                     {type === "route" && (
                         <>
-                            <Typography variant="caption">Punkt trasy</Typography>
                             <Button
                                 size="small"
-                                onClick={handleClick}
+                                onClick={() => {navigate("/feedback")}}
                                 sx={{ mt: 1 }}
                                 variant="contained"
                             >
-                                Prowadź tutaj
+                                Oceń
                             </Button>
                         </>
                     )}
@@ -179,6 +192,9 @@ const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) =>
 };
 
 const MapWithRouting: FC = () => {
+    const location = useLocation();
+    const tripData: TripData | undefined = location.state?.tripData;
+
     const [addRouteAllBlocked, setAddRouteAllBlocked] = useState(false);
     const [locations] = useState<LocationData[]>(exampleLocations);
     const [mapCenter] = useState<LatLngExpression | null>(null);
@@ -226,7 +242,10 @@ const MapWithRouting: FC = () => {
 
     const addRouteAllHandler = async () => {
         setAddRouteAllBlocked(true);
-        await fetchRouteSequenceData([userLocation, ...locations]);
+        const pointsToRoute = tripData?.locations
+            ? [userLocation, ...tripData.locations]
+            : [userLocation, ...locations];
+        await fetchRouteSequenceData(pointsToRoute);
         setTimeout(() => setAddRouteAllBlocked(false), 1000);
     };
 
@@ -280,14 +299,31 @@ const MapWithRouting: FC = () => {
                     onClick={() => {}}
                 />
 
-                {locations.map(loc => (
-                    <LocationMarker
-                        key={loc.id}
-                        location={loc}
-                        type="route"
-                        onClick={handleLocationClick}
-                    />
-                ))}
+                {tripData?.locations ? (
+                    tripData.locations.map((loc, index) => (
+                        <LocationMarker
+                            key={`trip-${index}`}
+                            location={{
+                                latitude: loc.latitude,
+                                longitude: loc.longitude,
+                                name: loc.name,
+                                description: loc.description
+                            }}
+                            type="route"
+                            onClick={handleLocationClick}
+                            icon={loc.icon}
+                        />
+                    ))
+                ) : (
+                    locations.map(loc => (
+                        <LocationMarker
+                            key={loc.id}
+                            location={loc}
+                            type="route"
+                            onClick={handleLocationClick}
+                        />
+                    ))
+                )}
 
                 {fullRoutes?.map((segment, i) =>
                     segment.length > 0 && (
