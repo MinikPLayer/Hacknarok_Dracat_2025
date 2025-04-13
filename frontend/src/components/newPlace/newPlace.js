@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaCamera, FaStar, FaArrowLeft, FaSave, FaTimes } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion'; // Dodano dla animacji
+import { motion, AnimatePresence } from 'framer-motion'; 
 import './newPlace.css';
+
 
 const AddPlace = () => {
   const navigate = useNavigate();
@@ -76,17 +77,24 @@ const AddPlace = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="add-place-header">
-        <motion.button
-          className="back-button"
-          onClick={() => navigate(-1)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <FaArrowLeft /> Powrót
-        </motion.button>
+    <div className="add-place-header">
+    <motion.button
+        className="back-button"
+        onClick={() => navigate(-1)}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+    >
+        <FaArrowLeft /> Powrót
+    </motion.button>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginLeft: '20px' }}>
         <h1>Dodaj nowe miejsce</h1>
-      </div>
+        <img 
+        src={"/media/kotelIcon.png"} 
+        alt="Cat icon" 
+        style={{ width: '60px', height: '60px' }} 
+        />
+    </div>
+    </div>
 
       <motion.form
         onSubmit={handleSubmit}

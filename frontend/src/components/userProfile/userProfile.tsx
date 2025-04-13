@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { FaMedal, FaTrophy, FaStar, FaCrown, FaLink } from 'react-icons/fa';
+import { FaMedal, FaTrophy, FaStar, FaCrown, FaLink, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import {
   Avatar,
   Button,
@@ -25,44 +25,61 @@ import { API_BASE_URL } from '../../config';
 import {FaPencil} from "react-icons/fa6";
 
 // Styled components
-const ProfileContainer = styled(Box)(({ theme }) => ({
+const ProfileContainer = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing(4),
-  padding: theme.spacing(4),
-  [theme.breakpoints.up('md')]: {
+  gap: '16px',
+  padding: '16px',
+  '@media (min-width: 960px)': {
     flexDirection: 'row',
-    alignItems: 'flex-start'
-  }
-}));
-
-const ProfileCard = styled(Box)(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius || '8px',
-  padding: theme.spacing(3),
-  boxShadow: "black",
-  flex: 1,
-  minWidth: 0
-}));
-
-const StatsCard = styled(ProfileCard)({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '24px'
-});
-
-const AchievementIcon = styled(IconButton)(({ theme }) => ({
-  background: `linear-gradient(45deg, #1976d2, #ff4081)`, // Zamieniono primary.main na #1976d2
-  color: '#ffffff', 
-  '&:hover': {
-    background: `linear-gradient(45deg, #3f37c9 #ff4081}, #1976d2)`, // Odwrócony gradient na hover
+    alignItems: 'flex-start',
   },
 }));
-const BioTextArea = styled(TextField)({
+
+const ProfileCard = styled(Box)(() => ({
+  borderRadius: '16px',
+  padding: '16px',
+  boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+  backgroundColor: '#ffffff', // Zastąpiono theme.palette.background.paper
+  flex: 1,
+  minWidth: 0,
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  '&:hover': {
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+    transform: 'translateY(-2px)',
+  },
+}));
+
+const StatsCard = styled(ProfileCard)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '24px',
+}));
+
+const AchievementIcon = styled(IconButton)(() => ({
+  background: 'linear-gradient(45deg, #1976d2, #ff4081)', // Zastąpiono theme.palette.primary.main i theme.palette.secondary.main
+  color: '#ffffff', // Zastąpiono theme.palette.common.white
+  '&:hover': {
+    background: 'linear-gradient(45deg, #ff4081, #1976d2)', // Odwrócony gradient
+  },
+}));
+
+const SocialIcon = styled(IconButton)(() => ({
+  color: '#757575', // Zastąpiono theme.palette.text.secondary
+  transition: 'all 0.3s',
+  '&:hover': {
+    transform: 'scale(1.2)',
+    color: '#1976d2', // Zastąpiono theme.palette.primary.main
+  },
+}));
+
+const BioTextArea = styled(TextField)(() => ({
   width: '100%',
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px'
-  }
-});
+    borderRadius: '12px',
+    backgroundColor: '#f5f5f5', // Zastąpiono theme.palette.background.default
+  },
+}));
 
 // Interfaces
 interface UserData {
@@ -78,6 +95,12 @@ interface UserData {
   friends?: string[];
   name?: string;
   surname?: string;
+  social_media?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+  };
 }
 
 interface VisitData {
@@ -266,6 +289,15 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
       .catch(() => alert('Błąd podczas kopiowania linku!'));
   };
 
+  const handleSocialMediaClick = (platform: string) => {
+    const url = userData?.social_media?.[platform as keyof typeof userData.social_media];
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      alert(`Brak linku do ${platform.charAt(0).toUpperCase() + platform.slice(1)}`);
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -408,6 +440,30 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
                 </Button>
               </Box>
             </Box>
+          )}
+        </ProfileCard>
+
+        {/* Nowa sekcja mediów społecznościowych */}
+        <ProfileCard>
+          <Typography variant="h6" mb={2}>Media społecznościowe</Typography>
+          <Box display="flex" justifyContent="center" gap={2}>
+            <SocialIcon onClick={() => handleSocialMediaClick('facebook')}>
+              <FaFacebook fontSize="24px" />
+            </SocialIcon>
+            <SocialIcon onClick={() => handleSocialMediaClick('twitter')}>
+              <FaTwitter fontSize="24px" />
+            </SocialIcon>
+            <SocialIcon onClick={() => handleSocialMediaClick('instagram')}>
+              <FaInstagram fontSize="24px" />
+            </SocialIcon>
+            <SocialIcon onClick={() => handleSocialMediaClick('linkedin')}>
+              <FaLinkedin fontSize="24px" />
+            </SocialIcon>
+          </Box>
+          {isOwnProfile && (
+            <Typography variant="body2" color="text.secondary" mt={2} textAlign="center">
+              Edytuj swoje profile w ustawieniach konta
+            </Typography>
           )}
         </ProfileCard>
       </Box>

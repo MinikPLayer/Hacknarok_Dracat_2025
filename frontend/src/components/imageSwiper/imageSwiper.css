@@ -1,153 +1,79 @@
-/* Główne kontenery */
-.app {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* Zmienione z center na flex-start */
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f7f7f7;
-  padding: 20px;
-  box-sizing: border-box;
+/* swiper.css */
+:root {
+  --primary-color: #1e90ff;
+  --accent-color: #ff6b6b;
+  --secondary-color: #2d3748;
+  --background-color: #f8fafc;
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --gradient: linear-gradient(135deg, #1e90ff, #60a5fa);
 }
 
-/* Karta - główny kontener */
-.card-container {
-  position: relative;
-  width: 90vw;
-  max-width: 600px;
-  height: 70vh;
-  margin: 110px auto 0;
-}
-
-/* Poszczególne karty */
-.card {
+.tinder-card-wrapper {
+  position: absolute;
   width: 100%;
-  height: 100%;
-  background-color: white;
-  border-radius: 15px;
+  max-width: 800px;
+}
+
+.tinder-card {
+  background: white;
+  border-radius: 16px;
   overflow: hidden;
-  position: absolute;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-
-/* Obraz w karcie */
-.card-image-container {
-  flex: 1;
-  background-size: cover;
-  background-position: center;
-  border-radius: 10px 10px 0 0;
-  margin-bottom: 16px;
-  max-height: 200px;
-  max-width: 100%;
-}
-
-/* Tekst w karcie */
-.card-content {
-  padding: 0 20px 20px;
-}
-
-.card-name {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.card-description {
-  font-size: 16px;
-  color: #666;
-  line-height: 1.5;
-}
-
-/* Przyciski */
-.buttons {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
   width: 100%;
-  max-width: 400px;
+  will-change: transform;
+  transition: box-shadow 0.3s ease;
 }
 
-.button {
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.tinder-card:hover {
+  box-shadow: var(--card-shadow);
 }
 
-.button-primary {
-  background-color: #ff4c4c;
-  color: white;
-}
-
-.button-primary:hover {
-  background-color: #ff1c1c;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Przycisk głośnika */
-.sound-button {
+.swipe-overlay {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10;
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 5rem;
+  color: white;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.sound-button:hover {
-  background-color: rgba(255, 255, 255, 0.9);
-  transform: scale(1.1);
+.swipe-overlay.right {
+  background: rgba(76, 175, 80, 0.7); /* Zielony dla polubienia */
 }
 
-/* Responsywność */
+.swipe-overlay.left {
+  background: rgba(244, 67, 54, 0.7); /* Czerwony dla odrzucenia */
+}
+
+.swipe-overlay.up {
+  background: rgba(59, 130, 246, 0.7); /* Niebieski dla szczegółów */
+}
+
+.swipe-overlay svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 @media (max-width: 768px) {
-  .card-container {
+  .tinder-card {
     width: 95vw;
-    height: 65vh;
-    margin-top: 90px;
   }
-  
-  .card-name {
-    font-size: 20px;
-  }
-  
-  .card-description {
-    font-size: 14px;
-  }
-  
-  .button {
-    padding: 10px 20px;
-    font-size: 14px;
+
+  .swipe-overlay {
+    font-size: 4rem;
   }
 }
 
 @media (max-width: 480px) {
-  .card-container {
-    height: 60vh;
+  .tinder-card {
+    width: 95vw;
   }
-  
-  .card-content {
-    padding: 0 15px 15px;
+
+  .swipe-overlay {
+    font-size: 3rem;
   }
 }

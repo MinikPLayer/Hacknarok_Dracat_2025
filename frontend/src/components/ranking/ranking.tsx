@@ -42,9 +42,9 @@ const RankingPage = () => {
   const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
 
   // Znajdź aktualnego użytkownika (w rzeczywistej aplikacji dane będą pobierane z kontekstu/API)
-  const currentUser = allUsers.find(user => user.id === 4); // Przykładowe ID
-  const token = localStorage.getItem("access")
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState<UserRanking | null>(null);
+  const currentUser = allUsers.find(user2 => user?.id); // Przykładowe ID
+  const token = localStorage.getItem("access");
 
 
   if (!isUserAuthenticated()) {
@@ -106,7 +106,21 @@ const RankingPage = () => {
   return (
     <div className="ranking-container">
       <header className="ranking-header">
-        <h1><FaTrophy /> Global Ranking</h1>
+        <h1>
+          <FaTrophy />
+          <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <img 
+              src="/media/dwakotel.png" 
+              alt="Cat icon" 
+              style={{ 
+                height: '40px', 
+                margin: '0 10px',
+                verticalAlign: 'middle' 
+              }} 
+            />
+            Global Ranking
+          </span>
+        </h1>
         <p>Top travelers based on experience level and visited places</p>
       </header>
 
@@ -248,7 +262,18 @@ const RankingPage = () => {
       {/* Statystyki aktualnego użytkownika */}
       {currentUser && (
         <div className="user-stats-card">
-          <h3>Your Position</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>Your Position</h3>
+            <img 
+              src="/media/dwakotel.png" 
+              alt="Cat icon" 
+              style={{ 
+                height: '50px', 
+                opacity: 0.8,
+                filter: 'grayscale(30%)'
+              }} 
+            />
+          </div>
           <div className="user-stats-content">
             <div className="user-rank">
               <span>Global: #{currentUser.globalRank}</span>
