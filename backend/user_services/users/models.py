@@ -62,6 +62,7 @@ class Location(models.Model):
     address = models.CharField(max_length=500, null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
+    description = models.TextField(max_length=1000, null=True, blank=True)
     added_by = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
     grade = models.FloatField(null=True, blank=True, default=0, max_length=5, validators=[MinValueValidator(0), MaxValueValidator(5)])
 

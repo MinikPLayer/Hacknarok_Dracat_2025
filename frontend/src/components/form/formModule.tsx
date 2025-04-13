@@ -147,10 +147,74 @@ const TripForm = () => {
           return;
         }
 
-        const tripData = {
-            ...formData,
-            mode: tripMode
-        };
+        // const tripData = {
+        //     ...formData,
+        //     mode: tripMode
+        // };
+
+const tripData = {
+    locations: [
+        {
+            id: 1,
+            name: "Główny Kampus",
+            latitude: 50.0645,
+            longitude: 19.9234,
+            description: "Budynek A, piętro 3",
+            icon: "❓️",
+            category: "education"
+        },
+        {
+            id: 2,
+            name: "Biblioteka Uniwersytecka",
+            latitude: 50.066,
+            longitude: 19.922,
+            description: "Czytelnia główna",
+            icon: "❓",
+            category: "education",
+            openingHours: "8:00-20:00"
+        },
+        {
+            id: 3,
+            name: "Stadion Sportowy",
+            latitude: 50.0632,
+            longitude: 19.927,
+            description: "Wejście północne",
+            icon: "❓",
+            category: "sport",
+            capacity: "5000 osób"
+        },
+        {
+            id: 4,
+            name: "Kawiarnia Campus",
+            latitude: 50.065,
+            longitude: 19.925,
+            description: "Najlepsza kawa w okolicy",
+            icon: "❓",
+            category: "food",
+            menu: ["Kawa", "Ciasta", "Kanapki"]
+        },
+        {
+            id: 5,
+            name: "Parking Główny",
+            latitude: 50.067,
+            longitude: 19.928,
+            description: "Strefa A, miejsca dla gości",
+            icon: "❓",
+            category: "parking",
+            spaces: 120
+        }
+    ],
+    routeOptions: {
+        vehicleType: "walking",
+        optimizeOrder: true,
+        waypointDelay: 15 // minuty na każdej lokalizacji
+    },
+    metadata: {
+        tripName: "Zwiedzanie kampusu",
+        created: "2023-05-15",
+        author: "Jan Kowalski"
+    }
+};
 
         console.log('Trip data submitted:', tripData);
         if (tripMode === "plan"){
