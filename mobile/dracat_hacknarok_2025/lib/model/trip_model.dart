@@ -6,6 +6,10 @@ class TripModel {
 
   String name;
 
+  List<LocationModel> get notVisitedPointsList {
+    return points.where((point) => !visitedPointsList.contains(point)).toList();
+  }
+
   TripModel({
     required this.points,
     required this.name,

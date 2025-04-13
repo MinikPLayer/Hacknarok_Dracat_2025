@@ -85,7 +85,7 @@ class MockTripProvider extends ChangeNotifier {
   }
 
   Future updateActiveTripData(TripModel trip, LatLng? userLocation) async {
-    var points = trip.points;
+    var points = trip.notVisitedPointsList;
     if (userLocation != null) {
       points.sort((p1, p2) {
         var distance1 = Distance().as(LengthUnit.Meter, p1.getLocation(), userLocation);
@@ -96,23 +96,12 @@ class MockTripProvider extends ChangeNotifier {
     }
 
     var tripData = await MapUtils.getTripBetweenPoints(points.map((e) => e.getLocation()).toList());
-    tripData.waypoints.removeWhere((x) {
-      for (var p in trip.visitedPointsList) {
-        var distance = Distance().as(LengthUnit.Meter, p.getLocation(), x.location);
-        if (distance < 1.0) {
-          return true;
-        }
-      }
-
-      return false;
-    });
-
     _activeTripData = ActiveTripData(activeTrip: trip, waypoints: tripData.waypoints, routes: tripData.routes);
 
     notifyListeners();
   }
 
-  void flagWaypointAsVisited(OSRMWaypoint waypoint) {
+  void flagWaypointAsVisited(OSRMWaypoint waypoint, LatLng? userLocation) {
     if (_activeTripData == null) return;
 
     var trip = _activeTripData!.activeTrip;
@@ -136,15 +125,11 @@ class MockTripProvider extends ChangeNotifier {
       print("Error - no point in active trip: $e");
     }
 
-    try {
-      _activeTripData!.waypoints.remove(waypoint);
-      if (waypoint.waypointIndex == 0) {
-        _activeTripData!.routes.removeAt(0);
-      }
-    } catch (e) {
-      // Handle the case where the point is not found in the list
-      print("Error: $e");
-    }
+    // _activeTripData = null;
+    // updateActiveTripData(trip, userLocation);
+    // Remove the point from the list of active trip data
+
+    _activeTripData?.waypoints.removeWhere((point) => point.location == waypoint.location);
 
     if (trip.points.length <= trip.visitedPointsList.length) {
       finishActiveTrip();

@@ -17,6 +17,8 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapComponentState extends State<MapPage> {
+  MapController mapController = MapController();
+
   OSRMWaypoint? openedLandmark;
 
   LatLng initialCenter = LatLng(50.0645, 19.9234);
@@ -35,18 +37,23 @@ class _MapComponentState extends State<MapPage> {
   OSRMWaypoint? currentlyVisitingWaypoint;
   static const double minAutoVisitDistance = 75.0;
 
-  Color getMarkerColorByIndex(bool isRouteEmpty, int index) {
+  Color getMarkerColorByWaypoint(bool isRouteEmpty, OSRMWaypoint waypoint) {
     if (isRouteEmpty) {
       return Colors.blue;
     }
 
-    switch (index) {
-      case 0:
-        return nearestColor;
-      case 1:
-        return secondColor;
-      default:
-        return thirdColor;
+    // switch (index) {
+    //   case 0:
+    //     return nearestColor;
+    //   case 1:
+    //     return secondColor;
+    //   default:
+    //     return thirdColor;
+    // }
+    if (waypoint.location == nearestWaypoint?.location) {
+      return nearestColor;
+    } else {
+      return thirdColor;
     }
   }
 
@@ -110,7 +117,7 @@ class _MapComponentState extends State<MapPage> {
                   ),
                 Icon(
                   Icons.location_pin,
-                  color: getMarkerColorByIndex(false, index),
+                  color: getMarkerColorByWaypoint(false, landmark),
                   size: iconSize,
                   shadows: [
                     Shadow(
@@ -195,7 +202,7 @@ class _MapComponentState extends State<MapPage> {
   }
 
   void checkForUserBeingCloseToWaypoint(LatLng? userPosition, List<OSRMWaypoint> waypoints) {
-    if (userPosition == null) {
+    if (userPosition == null || currentlyVisitingWaypoint != null) {
       return;
     }
 
@@ -253,8 +260,10 @@ class _MapComponentState extends State<MapPage> {
         location: currentlyVisitingWaypoint!,
         onBackPressed: () {
           setState(() {
-            tripProvider.flagWaypointAsVisited(currentlyVisitingWaypoint!);
+            tripProvider.flagWaypointAsVisited(currentlyVisitingWaypoint!, userProvider.currentUserLocation);
             currentlyVisitingWaypoint = null;
+            // Center camera on user
+            mapController.move(userProvider.currentUserLocation!, mapController.camera.zoom);
           });
         },
       );
@@ -268,6 +277,7 @@ class _MapComponentState extends State<MapPage> {
         Color color = Colors.green;
         var strokeWidth = 4.0;
         var pattern = StrokePattern.solid();
+
         switch (index) {
           case 0:
             color = secondColor.withAlpha(196);
@@ -310,6 +320,7 @@ class _MapComponentState extends State<MapPage> {
           children: [
             FlutterMap(
               options: MapOptions(initialCenter: initialCenter),
+              mapController: mapController,
               children: [
                 openStreetMapTileLayer,
                 MarkerLayer(markers: getMarkersList(activeTripData.waypoints, userProvider.currentUserLocation)),
