@@ -134,19 +134,6 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: null,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Icon(Icons.share),
-                                  ),
-                                  Text("Share your trip!"),
-                                ],
-                              ),
-                            ),
-                            ElevatedButton(
                               onPressed: tripNamecontroller.text.isEmpty
                                   ? null
                                   : () {
@@ -253,65 +240,67 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
       );
     }
 
-    if (openedDetailsLocation != null) {
-      return LocationDetailsComponent(
-        isReached: false,
-        locationName: openedDetailsLocation?.name ?? "Target",
-        onBackPressed: () {
-          setState(() {
-            openedDetailsLocation = null;
-          });
-        },
-      );
-    }
+    return Stack(
+      children: [
+        CardSwiper(
+          isLoop: false,
+          cardsCount: locations.length,
+          allowedSwipeDirection: AllowedSwipeDirection.only(left: true, right: true, up: true),
+          threshold: 90,
+          onEnd: () => setState(() {
+            if (selectedEntries.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("You need to select at least one world."),
+                ),
+              );
 
-    return CardSwiper(
-      isLoop: false,
-      cardsCount: locations.length,
-      allowedSwipeDirection: AllowedSwipeDirection.only(left: true, right: true, up: true),
-      threshold: 90,
-      onEnd: () => setState(() {
-        if (selectedEntries.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("You need to select at least one world."),
-            ),
-          );
+              provider.refreshLocations();
+              return;
+            }
 
-          provider.refreshLocations();
-          return;
-        }
+            if (tripNamecontroller.text.isEmpty) {
+              DateFormat dateTimeFormat = DateFormat.yMEd(Localizations.localeOf(context).toString());
+              DateTime dt = DateTime.now();
+              String dateString = dateTimeFormat.format(dt);
+              tripNamecontroller.text = "Trip $dateString";
+            }
 
-        if (tripNamecontroller.text.isEmpty) {
-          DateFormat dateTimeFormat = DateFormat.yMEd(Localizations.localeOf(context).toString());
-          DateTime dt = DateTime.now();
-          String dateString = dateTimeFormat.format(dt);
-          tripNamecontroller.text = "Trip $dateString";
-        }
+            isFinished = true;
+            confettiController.play();
+            confettiController2.play();
+          }),
+          onSwipe: (previousIndex, currentIndex, direction) async {
+            if (direction == CardSwiperDirection.top) {
+              setState(() {
+                openedDetailsLocation = locations[currentIndex!].location;
+              });
+              return false;
+            }
 
-        isFinished = true;
-        confettiController.play();
-        confettiController2.play();
-      }),
-      onSwipe: (previousIndex, currentIndex, direction) async {
-        if (direction == CardSwiperDirection.top) {
-          setState(() {
-            openedDetailsLocation = locations[currentIndex!].location;
-          });
-          return false;
-        }
-
-        if (direction == CardSwiperDirection.right) {
-          selectedEntries.add(locations[previousIndex]);
-        }
-        return true;
-      },
-      cardBuilder: (context, index, percentThresholdX, percentThresholdY) => SwipeCard(
-        backgroundWidget: locations[index].backgroundWidget,
-        title: locations[index].location.name,
-        description: locations[index].location.description,
-        targetLocation: locations[index].location.getLocation(),
-      ),
+            if (direction == CardSwiperDirection.right) {
+              selectedEntries.add(locations[previousIndex]);
+            }
+            return true;
+          },
+          cardBuilder: (context, index, percentThresholdX, percentThresholdY) => SwipeCard(
+            backgroundWidget: locations[index].backgroundWidget,
+            title: locations[index].location.name,
+            description: locations[index].location.description,
+            targetLocation: locations[index].location.getLocation(),
+          ),
+        ),
+        if (openedDetailsLocation != null)
+          LocationDetailsComponent(
+            isReached: false,
+            locationName: openedDetailsLocation?.name ?? "Target",
+            onBackPressed: () {
+              setState(() {
+                openedDetailsLocation = null;
+              });
+            },
+          )
+      ],
     );
   }
 }

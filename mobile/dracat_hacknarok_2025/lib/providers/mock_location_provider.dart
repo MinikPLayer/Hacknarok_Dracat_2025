@@ -58,7 +58,7 @@ class MockLocationProvider extends ChangeNotifier {
       var offsetLng = Random().nextDouble() * range;
 
       return LocationModel(
-        name: title,
+        name: "Example $title",
         description: "Description for location $title",
         imageUri: imagesURLs[Random().nextInt(imagesURLs.length)],
         latitude: initialCenter.latitude + offsetLat,
