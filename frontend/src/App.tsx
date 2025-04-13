@@ -45,7 +45,7 @@ function App() {
                         <Route path="/feedback" element={<FeedbackForm/>}/>
                         <Route path="/ranking" element={<RankingPage/>}/>
                         <Route path="/chat" element={<LlamaChat/>}/>
-                        <Route path="/world" element={<WorldResults/>}/>
+                        <Route path="/worlds" element={<WorldResults/>}/>
 
 
                     </Routes>

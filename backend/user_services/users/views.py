@@ -122,19 +122,25 @@ class OneUserData(APIView):
 
 
 class LlamaGenerateView(APIView):
-    def post(self, request):
+    def get(self, request):
         # Hardcoded reviews (you can change these to any fixed set of reviews)
-        reviews = {
-            "review_1": "Bardzo dobre jedzenie, szybka obsługa.",
-            "review_2": "Kelner był niemiły, ale jedzenie smaczne.",
-            "review_3": "Świetna atmosfera i wystrój, wrócę na pewno!"
+        wrazenia = {
+            "wrazenie_1": "Klimatyczna kawiarnia z ręcznie paloną kawą i pysznym ciastem marchewkowym. Stoliki w ogródku z widokiem na rzekę to świetne miejsce na relaks.",
+            "wrazenie_2": "Nowoczesne muzeum z interaktywnymi wystawami – dzieci były zachwycone możliwością dotykania eksponatów!",
+            "wrazenie_3": "Nastrojowa knajpka jazzowa z żywą muzyką kilka razy w tygodniu. Drinki wyśmienite, a kelnerzy znają się na winach.",
+            "wrazenie_4": "Park linowy w lesie – adrenalina i świetna zabawa dla całej rodziny. Instruktorzy dbają o bezpieczeństwo, a trasy są dla różnych poziomów.",
+            "wrazenie_5": "Urokliwa starówka z brukowanymi uliczkami i kolorowymi kamieniczkami. Idealne miejsce na wieczorny spacer z lampkami w tle.",
+            "wrazenie_6": "Górska chata z kominkiem i domowym jedzeniem. Po całym dniu wędrówki nic nie smakuje lepiej niż ich pierogi z jagodami!",
+            "wrazenie_7": "Plaża z drobnym piaskiem i lazurową wodą. Mało turystów, za to są leżaki i bary z koktajlami.",
+            "wrazenie_8": "Zabytkowa fabryka zamieniona w centrum sztuki – street art, koncerty i modne food trucki. Bardzo kreatywna przestrzeń!",
+            "wrazenie_9": "Fontanna Mozarta była kulminacyjnym elementem"
         }
 
         # Sklej wszystkie recenzje do jednego tekstu
-        combined_reviews = "\n".join(f"- {text}" for text in reviews.values())
+        combined_reviews = "\n".join(f"- {text}" for text in wrazenia.values())
 
         # Prompt do Mistrala
-        prompt = f"""Przeczytaj poniższe recenzje klientów i stwórz ich krótkie podsumowanie (2-3 zdania):
+        prompt = f"""Przeczytaj podane opisy miejsc odwiedzonych przez użytkownika i na ich podstawie stwórz krótki opis (2-3 zdania), który może umieścić na portalu społecznościowym jako streszczenie swojej podróży (napisz ciągły tekst, unikaj numeracji i brzmij jak człowiek):
     {combined_reviews}
     """
 

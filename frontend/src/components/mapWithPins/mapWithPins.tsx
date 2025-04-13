@@ -8,6 +8,9 @@ import { Feature, LineString, Point } from 'geojson'; // For OSRM response typin
 // Fix for default marker icons (ensure these paths are correct relative to your build output)
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconShadowUrl from 'leaflet/dist/images/marker-shadow.png';
+import {NavigateFunction, useNavigate} from "react-router-dom";
+
+
 
 // --- Interfaces and Types ---
 
@@ -95,6 +98,8 @@ const createRouteIcon = (): Icon => new L.Icon({
     shadowSize: [41, 41]
 });
 
+
+
 const createUserIcon = (): DivIcon => new L.DivIcon({
     html: '<div style="font-size: 24px; color: #FF5722;">👤</div>',
     className: '',
@@ -118,6 +123,7 @@ interface ChangeMapCenterProps {
 }
 
 const ChangeMapCenter: FC<ChangeMapCenterProps> = ({ center }) => {
+    const navigate = useNavigate();
     const map = useMap();
     useEffect(() => {
         if (center) {
@@ -180,41 +186,6 @@ const MapWithRouting: FC = () => {
     const [mapCenter] = useState<LatLngExpression | null>(null);
     const [fullRoutes, setFullRoutes] = useState<RouteSegment[] | null>(null); // State for multi-stop trip routes
     const mapRef = useRef<LeafletMap | null>(null);
-
-    // Example function for fetching route between two points (if needed separately)
-    // const fetchRouteBetweenTwoPoints = async (start: Coordinates, end: Coordinates): Promise<void> => {
-    //     try {
-    //         const response = await fetch(
-    //             `https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson`
-    //         );
-    //         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    //         const data: OSRMRouteResponse = await response.json();
-
-    //         console.log("OSRM Route Response:", data);
-
-    //         if (data.routes && data.routes.length > 0 && data.routes[0].geometry) {
-    //             // OSRM GeoJSON is [lng, lat], Leaflet Polyline needs [lat, lng]
-    //             const coordinates = data.routes[0].geometry.coordinates.map(
-    //                 (coord): LatLngExpression => [coord[1], coord[0]]
-    //             );
-    //             setRoute(coordinates);
-    //             setRouteEndpoints([start, end]);
-    //             // Optional: Center map on the new route
-    //             if (mapRef.current && coordinates.length > 0) {
-    //                const bounds = L.latLngBounds(coordinates);
-    //                mapRef.current.fitBounds(bounds);
-    //             }
-    //         } else {
-    //              console.warn("No route found between points.");
-    //              setRoute(null);
-    //              setRouteEndpoints([]);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching route:", error);
-    //         setRoute(null);
-    //         setRouteEndpoints([]);
-    //     }
-    // };
 
     const handleLocationClick = (location: Coordinates): void => {
         // Currently disabled in the original code, implement selection logic if needed
@@ -315,6 +286,7 @@ const MapWithRouting: FC = () => {
         const color = colors[index % colors.length];
         return `${color}${alphaHex}`; // Append alpha hex code (RGBA hex format)
     };
+    const navigate = useNavigate();
 
     return (
         <Box sx={{ padding: { xs: 1, sm: 2, md: 4 } }}> {/* Responsive padding */}
@@ -397,7 +369,12 @@ const MapWithRouting: FC = () => {
                 {mapCenter && <ChangeMapCenter center={mapCenter} />}
             </MapContainer>
 
-            <Button variant={"contained"}> Zakończ trasę</Button>
+            <Button
+              variant="contained"
+              onClick={() => navigate("/worlds")}
+            >
+              Zakończ trasę
+            </Button>
         </Box>
     );
 };
