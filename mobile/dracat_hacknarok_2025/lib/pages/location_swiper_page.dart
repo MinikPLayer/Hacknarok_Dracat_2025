@@ -243,6 +243,17 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
       allowedSwipeDirection: AllowedSwipeDirection.only(left: true, right: true),
       threshold: 90,
       onEnd: () => setState(() {
+        if (selectedEntries.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("You need to select at least one world."),
+            ),
+          );
+
+          provider.refreshLocations();
+          return;
+        }
+
         isFinished = true;
         confettiController.play();
         confettiController2.play();
