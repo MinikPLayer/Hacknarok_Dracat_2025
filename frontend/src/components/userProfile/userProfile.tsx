@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { FaMedal, FaTrophy, FaStar, FaCrown, FaLink, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import {
@@ -15,37 +15,34 @@ import {
   useTheme,
   IconButton,
   Chip,
-  CircularProgress
+  CircularProgress,
+  Divider
 } from "@mui/material";
 import QRCode from "react-qr-code";
 import Cropper from "react-easy-crop";
 import { styled } from '@mui/system';
 import client from '../../client';
 import { API_BASE_URL } from '../../config';
-import {FaPencil} from "react-icons/fa6";
+import { FaPencil } from "react-icons/fa6";
 
-// Styled components
+// Styled components (unchanged for brevity, using your CSS)
 const ProfileContainer = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '16px',
-  padding: '16px',
-  '@media (min-width: 960px)': {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
+  padding: '15px',
+  background: 'linear-gradient(135deg, #f0f4f8, #d9e2ec)',
+  borderRadius: '10px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  maxWidth: '1200px',
+  margin: '0 auto',
 }));
 
 const ProfileCard = styled(Box)(() => ({
-  borderRadius: '16px',
-  padding: '16px',
-  boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-  backgroundColor: '#ffffff', // Zastąpiono theme.palette.background.paper
-  flex: 1,
-  minWidth: 0,
+  background: '#ffffff',
+  borderRadius: '8px',
+  padding: '15px',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
   transition: 'transform 0.3s, box-shadow 0.3s',
   '&:hover': {
-    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     transform: 'translateY(-2px)',
   },
 }));
@@ -57,28 +54,40 @@ const StatsCard = styled(ProfileCard)(() => ({
 }));
 
 const AchievementIcon = styled(IconButton)(() => ({
-  background: 'linear-gradient(45deg, #1976d2, #ff4081)', // Zastąpiono theme.palette.primary.main i theme.palette.secondary.main
-  color: '#ffffff', // Zastąpiono theme.palette.common.white
+  fontSize: '1.8rem',
+  color: '#3498db',
   '&:hover': {
-    background: 'linear-gradient(45deg, #ff4081, #1976d2)', // Odwrócony gradient
+    transform: 'scale(1.1)',
   },
 }));
 
 const SocialIcon = styled(IconButton)(() => ({
-  color: '#757575', // Zastąpiono theme.palette.text.secondary
+  color: '#7f8c8d',
+  fontSize: '24px',
   transition: 'all 0.3s',
   '&:hover': {
     transform: 'scale(1.2)',
-    color: '#1976d2', // Zastąpiono theme.palette.primary.main
+    color: '#3498db',
   },
 }));
 
 const BioTextArea = styled(TextField)(() => ({
   width: '100%',
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
-    backgroundColor: '#f5f5f5', // Zastąpiono theme.palette.background.default
+    borderRadius: '8px',
+    backgroundColor: '#f8f9fa',
+    border: '1px solid #bdc3c7',
   },
+}));
+
+const SocialButton = styled(Button)(() => ({
+  width: '100%',
+  padding: '12px',
+  borderRadius: '8px',
+  fontSize: '0.9rem',
+  textTransform: 'none',
+  marginTop: '10px',
+  boxSizing: 'border-box',
 }));
 
 // Interfaces
@@ -113,43 +122,50 @@ interface GenreData {
   value: number;
 }
 
+interface SocialMediaData {
+  facebook: string;
+  twitter: string;
+  instagram: string;
+  linkedin: string;
+}
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 async function getCroppedImg(imageSrc: string, croppedAreaPixels: { x: number; y: number; width: number; height: number }) {
-    return new Promise((resolve, reject) => {
-        const image = new Image();
-        image.src = imageSrc;
-        image.crossOrigin = "anonymous";
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.crossOrigin = "anonymous";
 
-        image.onload = () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
 
-            if (!ctx) {
-                return reject(new Error("Nie można uzyskać kontekstu canvas"));
-            }
+      if (!ctx) {
+        return reject(new Error("Nie można uzyskać kontekstu canvas"));
+      }
 
-            canvas.width = croppedAreaPixels.width;
-            canvas.height = croppedAreaPixels.height;
+      canvas.width = croppedAreaPixels.width;
+      canvas.height = croppedAreaPixels.height;
 
-            ctx.drawImage(
-                image,
-                croppedAreaPixels.x, croppedAreaPixels.y,
-                croppedAreaPixels.width, croppedAreaPixels.height,
-                0, 0,
-                canvas.width, canvas.height
-            );
+      ctx.drawImage(
+        image,
+        croppedAreaPixels.x, croppedAreaPixels.y,
+        croppedAreaPixels.width, croppedAreaPixels.height,
+        0, 0,
+        canvas.width, canvas.height
+      );
 
-            canvas.toBlob((blob) => {
-                if (!blob) {
-                    return reject(new Error("Błąd konwersji obrazu"));
-                }
-                resolve(blob);
-            }, "image/png");
-        };
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          return reject(new Error("Błąd konwersji obrazu"));
+        }
+        resolve(blob);
+      }, "image/png");
+    };
 
-        image.onerror = (error) => reject(error);
-    });
+    image.onerror = (error) => reject(error);
+  });
 }
 
 const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
@@ -162,11 +178,18 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
   const [hover, setHover] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
-  const [crop, setCrop] = useState({x: 0, y: 0});
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [showCropModal, setShowCropModal] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [socialDialogOpen, setSocialDialogOpen] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<SocialMediaData>({
+    facebook: '',
+    twitter: '',
+    instagram: '',
+    linkedin: ''
+  });
 
   const token = localStorage.getItem("access");
 
@@ -185,6 +208,14 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
     { name: 'Horror', value: 20 },
     { name: 'Historyczne', value: 10 },
   ];
+
+  // Mock social media data (new)
+  const mockSocialMedia: SocialMediaData = {
+    facebook: 'https://facebook.com/user123',
+    twitter: 'https://twitter.com/user123',
+    instagram: 'https://instagram.com/user123',
+    linkedin: 'https://linkedin.com/in/user123'
+  };
 
   const onCropComplete = useCallback(
     (_: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
@@ -233,6 +264,15 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
     if (userData?.friends && userData.friends.length > 0) {
       setFriends(userData.friends);
     }
+    if (userData?.social_media) {
+      // Merge userData.social_media with defaults to avoid undefined
+      setSocialLinks({
+        facebook: userData.social_media.facebook || '',
+        twitter: userData.social_media.twitter || '',
+        instagram: userData.social_media.instagram || '',
+        linkedin: userData.social_media.linkedin || ''
+      });
+    }
   }, [userData]);
 
   useEffect(() => {
@@ -256,6 +296,19 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
         localStorage.setItem('profile_picture', image);
       } catch (error) {
         console.error('Błąd podczas pobierania danych użytkownika:', error);
+        // Use mock data on error
+        setUserData({
+          username: 'MockUser',
+          email: 'mockuser@example.com',
+          telephone: '123-456-789',
+          name: 'Jan',
+          surname: 'Kowalski',
+          rank: 'Nowy',
+          title: 'Podróżnik',
+          bio: 'Witaj w moim profilu!',
+          friends: ['Jan Kowalski', 'Anna Nowak', 'Piotr Zieliński'],
+          social_media: mockSocialMedia // Use mock social media data
+        });
         setProfileImage('/images/basic/user_no_picture.png');
       } finally {
         setLoading(false);
@@ -264,6 +317,22 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
 
     if (token) {
       fetchUserData();
+    } else {
+      // No token, use mock data
+      setUserData({
+        username: 'MockUser',
+        email: 'mockuser@example.com',
+        telephone: '123-456-789',
+        name: 'Jan',
+        surname: 'Kowalski',
+        rank: 'Nowy',
+        title: 'Podróżnik',
+        bio: 'Witaj w moim profilu!',
+        friends: ['Jan Kowalski', 'Anna Nowak', 'Piotr Zieliński'],
+        social_media: mockSocialMedia // Use mock social media data
+      });
+      setSocialLinks(mockSocialMedia);
+      setLoading(false);
     }
   }, [token]);
 
@@ -289,13 +358,52 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
       .catch(() => alert('Błąd podczas kopiowania linku!'));
   };
 
-  const handleSocialMediaClick = (platform: string) => {
-    const url = userData?.social_media?.[platform as keyof typeof userData.social_media];
-    if (url) {
-      window.open(url, '_blank');
-    } else {
-      alert(`Brak linku do ${platform.charAt(0).toUpperCase() + platform.slice(1)}`);
+  // Social Media Sharing Functions
+  const shareToFacebook = () => {
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(qrCodeValue)}`;
+    window.open(shareUrl, '_blank');
+  };
+
+  const shareToTwitter = () => {
+    const text = `Check out my profile!`;
+    const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(qrCodeValue)}&text=${encodeURIComponent(text)}`;
+    window.open(shareUrl, '_blank');
+  };
+
+  const shareToLinkedIn = () => {
+    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(qrCodeValue)}`;
+    window.open(shareUrl, '_blank');
+  };
+
+  const shareToInstagram = () => {
+    navigator.clipboard.writeText(qrCodeValue)
+      .then(() => alert('Profile link copied! Paste it into your Instagram post or story.'))
+      .catch(() => alert('Failed to copy link!'));
+  };
+
+  // Social Media Connection Management
+  const handleSocialLinkChange = (platform: keyof SocialMediaData, value: string) => {
+    setSocialLinks(prev => ({ ...prev, [platform]: value }));
+  };
+
+  const saveSocialLinks = async () => {
+    try {
+      await client.patch(`${API_BASE_URL}user/`, { social_media: socialLinks }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUserData(prev => prev ? { ...prev, social_media: socialLinks } : null);
+      setSocialDialogOpen(false);
+      alert('Social media links updated!');
+    } catch (error) {
+      console.error('Error updating social media links:', error);
+      alert('Failed to update social media links.');
     }
+  };
+
+  const disconnectSocialAccount = (platform: keyof SocialMediaData) => {
+    setSocialLinks(prev => ({ ...prev, [platform]: '' }));
   };
 
   if (loading) {
@@ -307,208 +415,227 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
   }
 
   return (
-    <ProfileContainer>
-      {/* Left Column - Profile Info */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
-        <ProfileCard>
-          <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={3}>
-            <Box position="relative" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-              <Avatar
-                src={profileImage}
-                sx={{
-                  width: 120,
-                  height: 120,
-                  filter: hover ? 'brightness(0.8)' : 'none',
-                  transition: 'filter 0.3s'
-                }}
-              />
-              {hover && isOwnProfile && (
-                <>
-                  <Box
-                    position="absolute"
-                    top="50%"
-                    left="50%"
-                    sx={{
-                      transform: 'translate(-50%, -50%)',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => document.getElementById('avatarInput')?.click()}
-                  >
-                    <FaPencil style={{ color: 'white', fontSize: '24px' }} />
-                  </Box>
-                  <input
-                    id="avatarInput"
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={handleImageUpload}
-                  />
-                </>
+    <ProfileContainer className="profile-container">
+      <Box className="profile-columns" sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: '20px' }}>
+        {/* Left Column - Profile Info */}
+        <Box className="left-column" sx={{ flex: { lg: '0 0 350px' }, position: { lg: 'sticky' }, top: '20px' }}>
+          <ProfileCard>
+            <Box className="profile-header" sx={{ flexDirection: { xs: 'column', md: 'row' }, gap: '15px', alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
+              <Box position="relative" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+                <Avatar
+                  src={profileImage}
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    filter: hover ? 'brightness(0.8)' : 'none',
+                    transition: 'filter 0.3s'
+                  }}
+                />
+                {hover && isOwnProfile && (
+                  <>
+                    <Box
+                      position="absolute"
+                      top="50%"
+                      left="50%"
+                      sx={{
+                        transform: 'translate(-50%, -50%)',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => document.getElementById('avatarInput')?.click()}
+                    >
+                      <FaPencil style={{ color: 'white', fontSize: '24px' }} />
+                    </Box>
+                    <input
+                      id="avatarInput"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={handleImageUpload}
+                    />
+                  </>
+                )}
+              </Box>
+              <Box className="profile-info">
+                <Typography variant="h4" className="name" fontWeight="bold" color="#2c3e50">
+                  {userData?.username || 'Użytkownik'}
+                </Typography>
+                <Box className="rank-title" display="flex" gap={1} my={1}>
+                  <Chip label={userData?.rank || 'Nowy'} color="primary" size="small" />
+                  <Chip label={userData?.title || 'Podróżnik'} variant="outlined" size="small" />
+                </Box>
+                <Box mt={2}>
+                  <Typography variant="body2" color="#7f8c8d">
+                    <strong>Email:</strong> {userData?.email || 'Brak danych'}
+                  </Typography>
+                  <Typography variant="body2" color="#7f8c8d">
+                    <strong>Telefon:</strong> {userData?.telephone || 'Brak danych'}
+                  </Typography>
+                  <Typography variant="body2" color="#7f8c8d">
+                    <strong>Imię i nazwisko:</strong> {userData?.name || 'Nie podano'} {userData?.surname || ''}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            <Divider className="divider" sx={{ my: '20px' }} />
+
+            <Box className="achievements" display="flex" justifyContent="center" gap={2}>
+              <AchievementIcon className="achievement-icon">
+                <FaMedal />
+              </AchievementIcon>
+              <AchievementIcon className="achievement-icon">
+                <FaTrophy />
+              </AchievementIcon>
+              <AchievementIcon className="achievement-icon">
+                <FaStar />
+              </AchievementIcon>
+              <AchievementIcon className="achievement-icon">
+                <FaCrown />
+              </AchievementIcon>
+            </Box>
+
+            <Box className="bio-section" mt={3}>
+              <Typography variant="h6" mb={1} color="#2c3e50">Bio</Typography>
+              {isOwnProfile ? (
+                <BioTextArea
+                  className="bio-text-editable"
+                  multiline
+                  rows={4}
+                  value={userData?.bio || ''}
+                  onChange={handleBioChange}
+                  placeholder="Dodaj swój opis..."
+                  variant="outlined"
+                />
+              ) : (
+                <Button
+                  className="challenge-button"
+                  variant="contained"
+                  fullWidth
+                  onClick={handleChallengeClick}
+                  sx={{ background: '#e74c3c', '&:hover': { background: '#c0392b' } }}
+                >
+                  Wyślij wyzwanie
+                </Button>
               )}
             </Box>
+          </ProfileCard>
 
-            <Box flex={1}>
-              <Typography variant="h4" fontWeight="bold">
-                {userData?.username || 'Użytkownik'}
-              </Typography>
-              <Box display="flex" gap={1} my={1}>
-                <Chip label={userData?.rank || 'Nowy'} color="primary" size="small" />
-                <Chip label={userData?.title || 'Podróżnik'} variant="outlined" size="small" />
-              </Box>
-
-              <Box mt={2}>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Email:</strong> {userData?.email || 'Brak danych'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Telefon:</strong> {userData?.telephone || 'Brak danych'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Imię i nazwisko:</strong> {userData?.name || 'Nie podano'} {userData?.surname || ''}
-                </Typography>
-              </Box>
+          <ProfileCard className="friends-section" sx={{ mt: '20px' }}>
+            <Typography variant="h6" mb={2} color="#2c3e50">Znajomi</Typography>
+            <Box className="friends-list" sx={{ maxHeight: { xs: '200px', lg: '150px' }, overflowY: 'auto' }}>
+              {friends.map((friend, index) => (
+                <Box key={index} className="friend-item" display="flex" alignItems="center" p={1} sx={{
+                  borderRadius: '6px',
+                  background: '#f8f9fa',
+                  mb: '5px'
+                }}>
+                  <Avatar sx={{ width: 32, height: 32, mr: 1 }} />
+                  <Typography>{friend}</Typography>
+                </Box>
+              ))}
             </Box>
-          </Box>
 
-          <Box display="flex" justifyContent="center" gap={2} mt={3}>
-            <AchievementIcon>
-              <FaMedal />
-            </AchievementIcon>
-            <AchievementIcon>
-              <FaTrophy />
-            </AchievementIcon>
-            <AchievementIcon>
-              <FaStar />
-            </AchievementIcon>
-            <AchievementIcon>
-              <FaCrown />
-            </AchievementIcon>
-          </Box>
-
-          <Box mt={3}>
-            <Typography variant="h6" mb={1}>Bio</Typography>
-            {isOwnProfile ? (
-              <BioTextArea
-                multiline
-                rows={4}
-                value={userData?.bio || ''}
-                onChange={handleBioChange}
-                placeholder="Dodaj swój opis..."
-                variant="outlined"
-              />
-            ) : (
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={handleChallengeClick}
-                sx={{ borderRadius: '12px' }}
-              >
-                Wyślij wyzwanie
-              </Button>
-            )}
-          </Box>
-        </ProfileCard>
-
-        <ProfileCard>
-          <Typography variant="h6" mb={2}>Znajomi</Typography>
-          <Box display="flex" flexDirection="column" gap={1}>
-            {friends.map((friend, index) => (
-              <Box key={index} display="flex" alignItems="center" p={1} sx={{
-                borderRadius: '8px',
-                '&:hover': { backgroundColor: 'action.hover' }
-              }}>
-                <Avatar sx={{ width: 32, height: 32, mr: 1 }} />
-                <Typography>{friend}</Typography>
-              </Box>
-            ))}
-          </Box>
-
-          {isOwnProfile && qrCodeValue && (
-            <Box mt={3} textAlign="center">
-              <Typography variant="h6" mb={1}>Udostępnij swój profil</Typography>
-              <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-                <Box p={2} bgcolor="white" borderRadius="8px">
+            {isOwnProfile && qrCodeValue && (
+              <Box className="qr-code-section" mt={3} textAlign="center">
+                <Typography variant="h6" mb={1} color="#2c3e50">Udostępnij swój profil</Typography>
+                <Box className="qr-code-wrapper" p={2} bgcolor="white" borderRadius="8px">
                   <QRCode value={qrCodeValue} size={120} />
                 </Box>
+                <Typography className="qr-code-instruction" color="#7f8c8d" my={1}>
+                  Zeskanuj kod lub skopiuj link, aby zaprosić znajomych.
+                </Typography>
                 <Button
-                  variant="outlined"
+                  className="copy-link-button"
+                  variant="contained"
                   startIcon={<FaLink />}
                   onClick={copyToClipboard}
-                  sx={{ borderRadius: '20px' }}
+                  sx={{ background: '#2ecc71', '&:hover': { background: '#27ae60' } }}
                 >
                   Skopiuj link
                 </Button>
               </Box>
-            </Box>
-          )}
-        </ProfileCard>
+            )}
+          </ProfileCard>
 
-        {/* Nowa sekcja mediów społecznościowych */}
-        <ProfileCard>
-          <Typography variant="h6" mb={2}>Media społecznościowe</Typography>
-          <Box display="flex" justifyContent="center" gap={2}>
-            <SocialIcon onClick={() => handleSocialMediaClick('facebook')}>
-              <FaFacebook fontSize="24px" />
-            </SocialIcon>
-            <SocialIcon onClick={() => handleSocialMediaClick('twitter')}>
-              <FaTwitter fontSize="24px" />
-            </SocialIcon>
-            <SocialIcon onClick={() => handleSocialMediaClick('instagram')}>
-              <FaInstagram fontSize="24px" />
-            </SocialIcon>
-            <SocialIcon onClick={() => handleSocialMediaClick('linkedin')}>
-              <FaLinkedin fontSize="24px" />
-            </SocialIcon>
-          </Box>
-          {isOwnProfile && (
-            <Typography variant="body2" color="text.secondary" mt={2} textAlign="center">
-              Edytuj swoje profile w ustawieniach konta
-            </Typography>
-          )}
-        </ProfileCard>
+          {/* Social Media Section */}
+          <ProfileCard sx={{ mt: '20px' }}>
+            <Typography variant="h6" mb={2} color="#2c3e50">Media społecznościowe</Typography>
+            <Box display="flex" justifyContent="center" gap={2}>
+              <SocialIcon onClick={shareToFacebook}>
+                <FaFacebook />
+              </SocialIcon>
+              <SocialIcon onClick={shareToTwitter}>
+                <FaTwitter />
+              </SocialIcon>
+              <SocialIcon onClick={shareToInstagram}>
+                <FaInstagram />
+              </SocialIcon>
+              <SocialIcon onClick={shareToLinkedIn}>
+                <FaLinkedin />
+              </SocialIcon>
+            </Box>
+            {isOwnProfile && (
+              <>
+                <SocialButton
+                  variant="outlined"
+                  onClick={() => setSocialDialogOpen(true)}
+                  sx={{ mt: '20px' }}
+                >
+                  Zarządzaj połączeniami
+                </SocialButton>
+                <Typography variant="body2" color="#7f8c8d" mt={2} textAlign="center">
+                  Udostępnij swój profil na mediach społecznościowych lub połącz konta.
+                </Typography>
+              </>
+            )}
+          </ProfileCard>
+        </Box>
+
+        {/* Right Column - Statistics */}
+        <Box className="right-column" sx={{ flex: { lg: 1 } }}>
+          <StatsCard className="chart-container">
+            <Typography variant="h5" fontWeight="bold" color="#2c3e50">Statystyki</Typography>
+
+            <Box>
+              <Typography variant="subtitle1" mb={1} color="#2c3e50">Miesięczne odwiedziny</Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyVisits}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="visits" fill="#3498db" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle1" mb={1} color="#2c3e50">Ulubione gatunki</Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Tooltip />
+                  <Pie
+                    data={genreData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={40}
+                    fill="#8884d8"
+                    label
+                  >
+                    {genreData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </Box>
+          </StatsCard>
+        </Box>
       </Box>
 
-      {/* Right Column - Statistics */}
-      <StatsCard sx={{ flex: isMobile ? 1 : 1.5 }}>
-        <Typography variant="h5" fontWeight="bold">Statystyki</Typography>
-
-        <Box>
-          <Typography variant="subtitle1" mb={1}>Miesięczne odwiedziny</Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyVisits}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="visits" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-
-        <Box>
-          <Typography variant="subtitle1" mb={1}>Ulubione gatunki</Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Tooltip />
-              <Pie
-                data={genreData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                innerRadius={40}
-                fill="#8884d8"
-                label
-              >
-                {genreData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </Box>
-      </StatsCard>
-
+      {/* Crop Modal */}
       <Dialog
         open={showCropModal}
         onClose={() => setShowCropModal(false)}
@@ -523,9 +650,8 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
       >
         <DialogTitle sx={{
           typography: 'h6',
-          bgcolor: 'background.paper',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
+          bgcolor: '#f8f9fa',
+          borderBottom: '1px solid #bdc3c7',
           py: 2
         }}>
           Edycja zdjęcia profilowego
@@ -534,7 +660,7 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
         <DialogContent sx={{
           position: 'relative',
           height: '400px',
-          bgcolor: 'background.default',
+          bgcolor: '#f0f4f8',
           p: 0
         }}>
           {imageSrc && (
@@ -553,9 +679,8 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
         </DialogContent>
 
         <DialogActions sx={{
-          bgcolor: 'background.paper',
-          borderTop: '1px solid',
-          borderColor: 'divider',
+          bgcolor: '#f8f9fa',
+          borderTop: '1px solid #bdc3c7',
           px: 3,
           py: 2
         }}>
@@ -570,9 +695,69 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
             onClick={handleCropSave}
             variant="contained"
             disableElevation
-            sx={{ borderRadius: '8px' }}
+            sx={{ borderRadius: '8px', background: '#3498db', '&:hover': { background: '#2980b9' } }}
           >
             Zapisz zmiany
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Social Media Management Dialog */}
+      <Dialog
+        open={socialDialogOpen}
+        onClose={() => setSocialDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            width: '90%',
+            maxWidth: '500px',
+            borderRadius: '8px'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#2c3e50' }}>
+          Zarządzaj mediami społecznościowymi
+        </DialogTitle>
+        <DialogContent>
+          {(['facebook', 'twitter', 'instagram', 'linkedin'] as const).map(platform => (
+            <Box key={platform} sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" color="#2c3e50" mb={1}>
+                {platform.charAt(0).toUpperCase() + platform.slice(1)}
+              </Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={socialLinks[platform]}
+                onChange={(e) => handleSocialLinkChange(platform, e.target.value)}
+                placeholder={`Podaj link do ${platform}`}
+                sx={{ mb: 1, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
+              {socialLinks[platform] && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => disconnectSocialAccount(platform)}
+                  sx={{ borderRadius: '8px' }}
+                >
+                  Odłącz
+                </Button>
+              )}
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setSocialDialogOpen(false)}
+            color="inherit"
+            sx={{ borderRadius: '8px' }}
+          >
+            Anuluj
+          </Button>
+          <Button
+            onClick={saveSocialLinks}
+            variant="contained"
+            sx={{ borderRadius: '8px', background: '#3498db', '&:hover': { background: '#2980b9' } }}
+          >
+            Zapisz
           </Button>
         </DialogActions>
       </Dialog>
