@@ -17,17 +17,17 @@ import { motion } from 'framer-motion';
 const Main = () => {
     const navigate = useNavigate();
     const [lastTrip, setLastTrip] = useState({
-        destination: "Kraków, Poland",
-        date: "15-18 June 2023",
+        destination: "Kraków, Polska",
+        date: "15-18 czerwca 2023",
         rating: 4.5,
         image: "https://images.unsplash.com/photo-1533856493584-0c6ca8ca9ce3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-        highlights: ["Wawel Castle", "Main Market Square", "Kazimierz District"]
+        highlights: ["Zamek Królewski na Wawelu", "Rynek Główny", "Kazimierz"]
     });
     const [upcomingTrip, setUpcomingTrip] = useState({
-        destination: "Gdańsk, Poland",
-        date: "22-25 July 2023",
+        destination: "Gdańsk, Polska",
+        date: "22-25 lipca 2023",
         image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-        countdown: "32 days to go"
+        countdown: "32 dni do wyjazdu"
     });
     const [loading, setLoading] = useState(false);
 
@@ -39,14 +39,14 @@ const Main = () => {
         return (
             <div className="loading-screen">
                 <div className="spinner"></div>
-                <p>Loading your travel data...</p>
+                <p>Ładowanie danych podróży...</p>
             </div>
         );
     }
 
     return (
         <div className="dashboard-container">
-            {/* Header with animated gradient and cat icon */}
+            {/* Nagłówek z gradientem i ikoną kota */}
             <motion.header 
                 className="dashboard-header"
                 initial={{ opacity: 0, y: -20 }}
@@ -54,13 +54,13 @@ const Main = () => {
                 transition={{ duration: 0.5 }}
             >
                 <div className="header-content">
-                    <h1>Welcome back, <span className="highlight">Explorer</span>!</h1>
-                    <p className="subtitle">Your travel journey continues...</p>
+                    <h1>Witaj ponownie, <span className="highlight">Podróżniku</span>!</h1>
+                    <p className="subtitle">Twoja podróż trwa dalej...</p>
                     <div className="header-decoration"></div>
                 </div>
                 <motion.img 
                     src="/media/kotsppanko.png" 
-                    alt="Cute cat mascot"
+                    alt="Uroczy kot maskotka"
                     className="header-cat"
                     initial={{ scale: 0.8, rotate: -10 }}
                     animate={{ scale: 1, rotate: 0 }}
@@ -74,7 +74,7 @@ const Main = () => {
                 />
             </motion.header>
 
-            {/* Quick Actions with cat button */}
+            {/* Szybkie akcje */}
             <section className="quick-actions">
                 <motion.button 
                     className="action-card primary"
@@ -87,7 +87,7 @@ const Main = () => {
                     </div>
                     <div className="action-content">
                         <h3>Ranking</h3>
-                        <p>See your position among friends</p>
+                        <p>Zobacz swoją pozycję wśród znajomych</p>
                     </div>
                     <span className="action-arrow"><FaArrowRight /></span>
                 </motion.button>
@@ -102,39 +102,39 @@ const Main = () => {
                         <FaRoute />
                     </div>
                     <div className="action-content">
-                        <h3>New Trip</h3>
-                        <p>Plan your next journey</p>
+                        <h3>Nowa podróż</h3>
+                        <p>Zaplanuj swoją następną podróż</p>
                     </div>
                     <span className="action-arrow"><FaArrowRight /></span>
                 </motion.button>
 
                 <motion.button 
                     className="action-card cat-card"
-                    onClick={() => navigate('/cat-mode')}
+                    onClick={() => navigate('/newPlace')}
                     whileHover={{ y: -5, rotate: -2 }}
                     whileTap={{ scale: 0.98 }}
                 >
                     <div className="action-icon">
                         <img 
                             src="/media/kotsppanko.png" 
-                            alt="Cat mode" 
+                            alt="Dodaj nowe miejsce" 
                             className="cat-icon"
                         />
                     </div>
                     <div className="action-content">
-                        <h3>Cat Mode</h3>
-                        <p>Special feline adventures</p>
+                        <h3>Dodaj nowe miejsce</h3>
+                        <p>Podziel się swoimi ulubionymi miejscówkami</p>
                     </div>
                     <span className="action-arrow"><FaArrowRight /></span>
                 </motion.button>
             </section>
 
-            {/* Last Trip Section */}
+            {/* Sekcja ostatniej podróży */}
             <section className="trip-section">
                 <div className="section-header">
-                    <h2 className="section-title">Your Last Adventure</h2>
+                    <h2 className="section-title">Twoja ostatnia przygoda</h2>
                     <button className="view-all" onClick={() => navigate('/trips')}>
-                        View All <FaArrowRight />
+                        Zobacz wszystkie <FaArrowRight />
                     </button>
                 </div>
                 
@@ -150,7 +150,7 @@ const Main = () => {
                             style={{ backgroundImage: `url(${lastTrip.image})` }}
                         >
                             <div className="image-overlay"></div>
-                            <div className="trip-badge">Completed</div>
+                            <div className="trip-badge">Zakończona</div>
                         </div>
                         <div className="trip-info">
                             <div className="trip-header">
@@ -165,7 +165,7 @@ const Main = () => {
                             </div>
                             
                             <div className="trip-highlights">
-                                <h4>Trip Highlights:</h4>
+                                <h4>Najważniejsze punkty podróży:</h4>
                                 <div className="highlight-tags">
                                     {lastTrip.highlights.map((highlight, index) => (
                                         <span key={index} className="highlight-tag">
@@ -179,20 +179,20 @@ const Main = () => {
                                 className="btn-details"
                                 onClick={() => navigate('/worlds')}
                             >
-                                View Full Experience <FaArrowRight />
+                                Zobacz pełne doświadczenie <FaArrowRight />
                             </button>
                         </div>
                     </motion.div>
                 ) : (
                     <div className="no-trips">
                         <div className="no-trips-content">
-                            <h3>No trips yet</h3>
-                            <p>Start your adventure today!</p>
+                            <h3>Brak podróży</h3>
+                            <p>Rozpocznij swoją przygodę już dziś!</p>
                             <button 
                                 className="btn-primary"
                                 onClick={() => navigate('/swiper')}
                             >
-                                <FaPlus /> Plan Your First Trip
+                                <FaPlus /> Zaplanuj swoją pierwszą podróż
                             </button>
                         </div>
                     </div>

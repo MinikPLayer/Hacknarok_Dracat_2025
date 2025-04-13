@@ -7,7 +7,7 @@
     --text-color: #1f2937;
     --light-gray: #e5e7eb;
     --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    --gradient: linear-gradient(135deg, #3b82f6, #60a5fa);
+    --gradient: linear-gradient(135deg, #4361ee, #f72585);
   }
   
   * {
@@ -105,7 +105,7 @@
   }
   
   .info-section h3 {
-    color: var(--secondary-color);
+    color: linear-gradient(90deg, var(--primary), var(--accent));
     font-size: clamp(1.1rem, 2vw, 1.3rem);
     margin-bottom: 0.75rem;
   }
@@ -117,7 +117,7 @@
   }
   
   .news-title {
-    color: var(--secondary-color);
+    color: linear-gradient(90deg, var(--primary), var(--accent));
     font-size: clamp(1.4rem, 3vw, 1.8rem);
     text-align: center;
   }
@@ -153,14 +153,14 @@
   
   .card-date {
     display: block;
-    color: var(--primary-color);
+    color: linear-gradient(90deg, var(--primary), var(--accent));
     font-size: 0.9rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
   }
   
   .event-card h4 {
-    color: var(--secondary-color);
+    color: linear-gradient(90deg, var(--primary), var(--accent));
     font-size: clamp(1rem, 2vw, 1.2rem);
     margin-bottom: 0.5rem;
   }
@@ -169,7 +169,7 @@
     display: block;
     margin: 1rem auto;
     padding: 0.75rem 2rem;
-    background: var(--primary-color);
+    background: linear-gradient(90deg, var(--primary), var(--accent));
     color: white;
     border: none;
     border-radius: 2rem;
@@ -199,14 +199,14 @@
   
   .cta-join h4,
   .cta-extra h4 {
-    color: var(--secondary-color);
+    color: linear-gradient(90deg, var(--primary), var(--accent));
     font-size: clamp(1.1rem, 2vw, 1.3rem);
     margin-bottom: 1rem;
   }
   
   .join-button {
     display: inline-block;
-    background: var(--primary-color);
+    background: linear-gradient(90deg, var(--primary), var(--accent));
     color: white;
     padding: 0.75rem 2rem;
     border-radius: 2rem;
@@ -236,7 +236,7 @@
     content: '✓';
     position: absolute;
     left: 0;
-    color: var(--primary-color);
+    color: linear-gradient(90deg, var(--primary), var(--accent));
   }
   
   @media (max-width: 1024px) {
@@ -290,4 +290,11 @@
     .news-image {
       height: 160px;
     }
+  }
+
+  .gradient-text {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
   }

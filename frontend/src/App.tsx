@@ -19,6 +19,7 @@ import FeedbackForm from "./components/feedbackForm/feedbackForm";
 import RankingPage from './components/ranking/ranking';
 import LlamaChat from "./components/llamaChat/llamaChat";
 import WorldResults from "./components/llamaChat/worldResults";
+import AddPlace from './components/newPlace/newPlace';
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
                         <Route path="/ranking" element={<RankingPage/>}/>
                         <Route path="/chat" element={<LlamaChat/>}/>
                         <Route path="/worlds" element={<WorldResults/>}/>
+                        <Route path='/newPlace' element={<AddPlace/>}/>
 
 
                     </Routes>
