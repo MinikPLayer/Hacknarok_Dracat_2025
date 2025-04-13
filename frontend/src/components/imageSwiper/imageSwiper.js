@@ -17,16 +17,20 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { FaArrowRight, FaHeart, FaTimes, FaMapMarkerAlt, FaStar, FaArrowLeft } from 'react-icons/fa';
 import './imageSwiper.css';
 
-const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard }) => {
+const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard, setExpandedState }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState(0);
   const [isLeaving, setIsLeaving] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  useEffect(() => {
+    setExpandedState(isExpanded);
+  }, [isExpanded, setExpandedState]);
+
   const bind = useGesture({
     onDrag: ({ down, movement: [mx, my], velocity }) => {
-      if (!isTopCard || isExpanded) return; // Tylko górna karta reaguje na gesty
+      if (!isTopCard || isExpanded) return; // Only top card responds to gestures
 
       if (!down && (Math.abs(mx) > 100 || Math.abs(my) > 100)) {
         const direction =
@@ -42,7 +46,7 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard }) =>
           setLastSwipe(direction);
           setSwipeDirection(direction);
           if (direction === 'up') {
-            setIsExpanded(true); // Rozszerz kartę zamiast swipe
+            setIsExpanded(true); // Expand card instead of swipe
           } else {
             handleSwipe(direction);
           }
@@ -91,12 +95,33 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard }) =>
 
   const getOverlay = () => {
     if (!swipeDirection || isExpanded) return null;
+    const overlayColor =
+      swipeDirection === 'right'
+        ? 'rgba(0, 255, 0, 0.3)' // Zielony dla serduszka
+        : swipeDirection === 'left'
+        ? 'rgba(255, 0, 0, 0.3)' // Czerwony dla X
+        : 'rgba(0, 0, 255, 0.3)'; // Niebieski dla góry (opcjonalnie)
+  
     return (
       <motion.div
         className={`swipe-overlay ${swipeDirection}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.7 }}
         transition={{ duration: 0.2 }}
+        style={{
+          backgroundColor: overlayColor,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          borderRadius: '16px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'white',
+          fontSize: '3rem',
+        }}
       >
         {swipeDirection === 'right' && <FaHeart />}
         {swipeDirection === 'left' && <FaTimes />}
@@ -116,6 +141,7 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard }) =>
       }}
       transition={{ duration: 0.3 }}
     >
+      
       <Card
         {...(isTopCard && !isExpanded ? bind() : {})}
         className="tinder-card"
@@ -128,12 +154,12 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard }) =>
           width: isExpanded ? { xs: '95vw', sm: '85vw', md: '70vw' } : { xs: '90vw', sm: '75vw', md: '60vw' },
           maxWidth: isExpanded ? '800px' : '600px',
           height: isExpanded ? 'auto' : { xs: '75vh', sm: '80vh' },
-          maxHeight: isExpanded ? 'none' : '700px',
+          maxHeight: isExpanded ? 'calc(100vh - 200px)' : '700px',
           cursor: isExpanded ? 'default' : 'grab',
           touchAction: isExpanded ? 'auto' : 'none',
           userSelect: 'none',
           borderRadius: '16px',
-          overflow: 'hidden',
+          overflowY: isExpanded ? 'auto' : 'hidden',
           boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
           bgcolor: 'white',
         }}
@@ -382,13 +408,10 @@ const ImageSwiper = () => {
     {
       id: 1,
       name: 'Zamek w Malborku',
-      description:
-        'Majestatyczna gotycka twierdza, pełna historii i tajemnic.',
-      image:
-        'https://bi.im-g.pl/im/7f/27/1e/z31617663IHR,Ktory-zamek-jest-najwiekszy-na-swiecie-.jpg',
+      description: 'Majestatyczna gotycka twierdza, pełna historii i tajemnic.',
+      image: 'https://bi.im-g.pl/im/7f/27/1e/z31617663IHR,Ktory-zamek-jest-najwiekszy-na-swiecie-.jpg',
       details: {
-        fullDescription:
-          'Ta imponująca gotycka twierdza to jeden z największych zamków na świecie. Otoczony malowniczymi murami, oferuje zwiedzającym podróż w czasie do średniowiecza. Wewnątrz znajdują się muzea z eksponatami militariów i sztuki, a także piękne krużganki i sale rycerskie.',
+        fullDescription: 'Ta imponująca gotycka twierdza to jeden z największych zamków na świecie. Otoczony malowniczymi murami, oferuje zwiedzającym podróż w czasie do średniowiecza. Wewnątrz znajdują się muzea z eksponatami militariów i sztuki, a także piękne krużganki i sale rycerskie.',
         location: 'Północna Polska',
         rating: 4.8,
         additionalImages: [
@@ -396,7 +419,7 @@ const ImageSwiper = () => {
           'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
           'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
         ],
-        video: 'https://youtu.be/zFidNgzElbU?si=ReNVm-a0YQPsnfVi', // Film o zamku (ogólny zamek gotycki)
+        video: 'https://youtu.be/zFidNgzElbU?si=ReNVm-a0YQPsnfVi',
         reviews: [
           {
             author: 'Anna K.',
@@ -414,13 +437,10 @@ const ImageSwiper = () => {
     {
       id: 2,
       name: 'Kopalnia Soli w Wieliczce',
-      description:
-        'Podziemny labirynt solnych korytarzy i kaplic.',
-      image:
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      description: 'Podziemny labirynt solnych korytarzy i kaplic.',
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
       details: {
-        fullDescription:
-          'Ten podziemny kompleks to prawdziwy cud natury i techniki. Korytarze wykute w soli skrywają zapierające dech w piersiach kaplice, rzeźby i jeziora. To miejsce oferuje nie tylko historię, ale także unikalny mikroklimat, który przyciąga turystów z całego świata.',
+        fullDescription: 'Ten podziemny kompleks to prawdziwy cud natury i techniki. Korytarze wykute w soli skrywają zapierające dech w piersiach kaplice, rzeźby i jeziora. To miejsce oferuje nie tylko historię, ale także unikalny mikroklimat, który przyciąga turystów z całego świata.',
         location: 'Południowa Polska',
         rating: 4.7,
         additionalImages: [
@@ -428,7 +448,7 @@ const ImageSwiper = () => {
           'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
           'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
         ],
-        video: 'https://www.youtube.com/embed/Xr2pH7sIzEg', // Film o podziemnych jaskiniach
+        video: 'https://www.youtube.com/embed/Xr2pH7sIzEg',
         reviews: [
           {
             author: 'Kasia L.',
@@ -446,13 +466,10 @@ const ImageSwiper = () => {
     {
       id: 3,
       name: 'Białowieski Park Narodowy',
-      description:
-        'Puszcza pełna dzikiej przyrody i majestatycznych żubrów.',
-      image:
-        'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      description: 'Puszcza pełna dzikiej przyrody i majestatycznych żubrów.',
+      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
       details: {
-        fullDescription:
-          'Ten pierwotny las to jeden z ostatnich takich ekosystemów w Europie. Dom dla żubrów i niezliczonych gatunków roślin i zwierząt, park oferuje szlaki piesze, rowerowe oraz możliwość obcowania z naturą w jej najczystszej formie. To idealne miejsce na spokojny wypoczynek.',
+        fullDescription: 'Ten pierwotny las to jeden z ostatnich takich ekosystemów w Europie. Dom dla żubrów i niezliczonych gatunków roślin i zwierząt, park oferuje szlaki piesze, rowerowe oraz możliwość obcowania z naturą w jej najczystszej formie. To idealne miejsce na spokojny wypoczynek.',
         location: 'Wschodnia Polska',
         rating: 4.9,
         additionalImages: [
@@ -460,7 +477,7 @@ const ImageSwiper = () => {
           'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
           'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
         ],
-        video: 'https://www.youtube.com/embed/Uv7W1VTSM0s', // Film o parku narodowym
+        video: 'https://www.youtube.com/embed/Uv7W1VTSM0s',
         reviews: [
           {
             author: 'Marta Z.',
@@ -478,6 +495,7 @@ const ImageSwiper = () => {
   ]);
   const [lastSwipe, setLastSwipe] = useState(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [hasExpandedCard, setHasExpandedCard] = useState(false);
   const audioRef = useRef(null);
   const navbarHeight = 140;
   const navigate = useNavigate();
@@ -510,6 +528,7 @@ const ImageSwiper = () => {
         alignItems: 'center',
         pt: { xs: '100px', sm: '120px' },
         px: 2,
+        pb: hasExpandedCard ? '100px' : 0,
       }}
     >
       <audio
@@ -517,6 +536,7 @@ const ImageSwiper = () => {
         src="https://assets.mixkit.co/sfx/preview/mixkit-quick-swoosh-1474.mp3"
         muted={isMuted}
       />
+      
 
       <IconButton
         onClick={toggleMute}
@@ -556,7 +576,8 @@ const ImageSwiper = () => {
               onSwipe={(direction) => handleSwipe(direction, card.id)}
               setLastSwipe={setLastSwipe}
               navbarHeight={navbarHeight}
-              isTopCard={index === cards.length - 1} // Tylko ostatnia karta jest interaktywna
+              isTopCard={index === cards.length - 1}
+              setExpandedState={(expanded) => setHasExpandedCard(expanded)}
             />
           ))}
         </AnimatePresence>
