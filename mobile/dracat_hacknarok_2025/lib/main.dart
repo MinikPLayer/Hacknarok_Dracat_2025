@@ -1,5 +1,8 @@
 import 'package:dracat_hacknarok_2025/pages/map_page.dart';
+import 'package:dracat_hacknarok_2025/pages/location_swiper_page.dart';
+import 'package:dracat_hacknarok_2025/provider/mock_location_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +19,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ChangeNotifierProvider(
+        create: (context) => MockLocationProvider(),
+        child: const MyHomePage(title: 'Flutter Demo Home Page'),
+      ),
     );
   }
 }
@@ -44,12 +50,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget? bodyWidget;
+
+    switch (currentPage) {
+      case 0:
+        bodyWidget = LocationSwiperPage();
+        break;
+      case 1:
+        bodyWidget = MapPage();
+        break;
+      case 2:
+        bodyWidget = Text('User Page');
+        break;
+      default:
+        bodyWidget = Text('Swipe Page');
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary, title: Text(widget.title)),
-      body: Center(child: MapPage()),
+      body: Center(child: bodyWidget),
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.swipe), label: 'Swipe'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'User'),
         ],
