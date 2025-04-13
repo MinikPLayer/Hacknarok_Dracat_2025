@@ -1,3 +1,4 @@
+import 'package:dracat_hacknarok_2025/components/map_demo_menu_component.dart';
 import 'package:dracat_hacknarok_2025/mics/tile_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_user_provider.dart';
@@ -19,9 +20,6 @@ class _MapComponentState extends State<MapPage> {
 
   LatLng initialCenter = LatLng(50.0645, 19.9234);
 
-  bool demoMenuExpanded = false;
-  bool isRouteGenerationAvailable = true;
-
   static Color nearestColor = Colors.green;
   static Color secondColor = Colors.green.withBlue(64);
   static Color thirdColor = Colors.blue;
@@ -31,7 +29,7 @@ class _MapComponentState extends State<MapPage> {
   MapRoute? nearestRoute;
   DateTime lastWaypointUpdate = DateTime.fromMicrosecondsSinceEpoch(0);
 
-  static const Duration waypointUpdateInterval = Duration(seconds: 5);
+  static const Duration waypointUpdateInterval = Duration(seconds: 2);
 
   Color getMarkerColorByIndex(bool isRouteEmpty, int index) {
     if (isRouteEmpty) {
@@ -355,57 +353,7 @@ class _MapComponentState extends State<MapPage> {
             ),
           ],
         ),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (demoMenuExpanded)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 32.0),
-                      child: Card(
-                        color: Colors.white.withAlpha(196),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Demo menu",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium!
-                                      .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FloatingActionButton(
-                  child: demoMenuExpanded ? const Icon(Icons.arrow_drop_down) : const Icon(Icons.arrow_drop_up),
-                  onPressed: () {
-                    setState(() {
-                      demoMenuExpanded = !demoMenuExpanded;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+        floatingActionButton: MapDemoMenuComponent(userProvider: userProvider),
       ),
     );
   }

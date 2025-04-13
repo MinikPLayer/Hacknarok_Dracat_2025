@@ -44,6 +44,7 @@ dependencies:
   shared_preferences: ^2.5.3
   geolocator: ^13.0.4
   intl: ^0.20.2
+  flutter_joystick: ^0.2.2
 
 dev_dependencies:
   flutter_test:

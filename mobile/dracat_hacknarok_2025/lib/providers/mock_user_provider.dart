@@ -71,10 +71,19 @@ class MockUserProvider extends ChangeNotifier {
   UserState? get userState => _userState;
 
   bool _forceMockLocation = false;
+  bool get forceMockLocation => _forceMockLocation;
+  set forceMockLocation(bool value) {
+    _forceMockLocation = value;
+    notifyListeners();
+  }
+
   LatLng? _currentMockLocation;
   LatLng? _currentRealLocation;
 
-  LatLng? get currentUserLocation => _forceMockLocation || (_userState == null || _userState!.allowLocation != true)
+  LatLng? get currentMockLocation => _currentMockLocation;
+  LatLng? get currentRealLocation => _currentRealLocation;
+
+  LatLng? get currentUserLocation => forceMockLocation || (_userState == null || _userState!.allowLocation != true)
       ? _currentMockLocation
       : _currentRealLocation;
 
