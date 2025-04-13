@@ -32,6 +32,38 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
     "Hannah Montana",
   ];
 
+  static const List<String> llmSummaries = [
+    // 1. Generally positive, but crowded
+    "Generally positive, but crowded: Most visitors are delighted by the beauty of this place, especially emphasizing the incredible views and architecture. However, a common observation is the huge number of tourists, particularly during peak season, which can make sightseeing difficult and spoil the atmosphere. High prices are also frequently mentioned.",
+
+    // 2. Mixed feelings - beauty vs. infrastructure
+    "Mixed feelings - beauty vs. infrastructure: Tourists unanimously praise the natural assets and unique monuments of this place. On the other hand, many negative reviews concern poor infrastructure – access problems, a lack of sufficient restaurants or restrooms, and inadequate cleanliness in some areas.",
+
+    // 3. Ideal for those seeking peace
+    "Ideal for those seeking peace: This place receives enthusiastic reviews from people who value tranquility, authenticity, and contact with nature. Users highlight the lack of crowds, the local atmosphere, and the opportunity for genuine relaxation. Some point out the absence of typical 'tourist attractions,' which is a disadvantage for some but an advantage for others.",
+
+    // 4. Overpriced and commercial
+    "Overpriced and commercial: Reviews indicating disappointment are dominant. Many tourists feel the place is overhyped, too expensive, and solely profit-driven. They complain about crowds, pushy vendors, and a lack of authentic character, labeling it a 'tourist trap'.",
+
+    // 5. Great value for money
+    "Great value for money: Visitors are generally very satisfied, mainly because of the affordable prices. They praise inexpensive accommodation, tasty and reasonably priced food, and numerous free or low-cost attractions. They stress that it's an excellent choice for budget-conscious travelers, though some mention that service standards might be slightly lower.",
+
+    // 6. Praise for history and atmosphere
+    "Praise for history and atmosphere: Reviews are overwhelmingly positive, with tourists especially appreciating the rich history, well-preserved monuments, and unique atmosphere. Many highlight the charming old town and the feeling of 'stepping back in time.' Occasionally, remarks arise about the need for renovation in some buildings.",
+
+    // 7. Paradise for the active
+    "Paradise for the active: The place earns high marks, especially from those who enjoy active recreation. Numerous hiking and biking trails, opportunities for water sports, and beautiful scenery are praised. Users point out the good sports and recreational infrastructure.",
+
+    // 8. Positive, but with comments on cleanliness
+    "Positive, but with comments on cleanliness: The overall perception of the place is good; tourists appreciate its charm and attractions. However, a recurring theme in reviews involves concerns about cleanliness – littered streets, overflowing bins, or neglected green spaces, which somewhat detracts from the overall impression.",
+
+    // 9. Family idyll
+    "Family idyll: Many users, particularly families with children, rate this place very highly. They emphasize safety, the availability of attractions for children (playgrounds, theme parks, gentle beaches), and the overall friendly atmosphere. They point out good accommodation and dining facilities suited to family needs.",
+
+    // 10. One main attraction 'does the job'
+    "One main attraction 'does the job': Opinions on the overall experience are mixed, but nearly everyone is impressed by one specific main attraction (e.g., an impressive castle, a unique museum, a spectacular national park). Visitors often come primarily for this single highlight, finding the rest less interesting or underdeveloped."
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +144,20 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "AI Summary of reviews:",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 400,
+                      child: Text(
+                        llmSummaries[Random().nextInt(llmSummaries.length)],
+                        softWrap: true,
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
