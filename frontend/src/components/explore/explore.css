@@ -1,0 +1,335 @@
+:root {
+    --primary: #4361ee;
+    --primary-light: #4895ef;
+    --secondary: #3f37c9;
+    --accent: #f72585;
+    --dark: #1b263b;
+    --light: #f8f9fa;
+    --gray: #adb5bd;
+    --gray-light: #e9ecef;
+    --gray-dark: #495057;
+  }
+  
+  .explore-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: var(--dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Nagłówek */
+  .explore-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .explore-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .back-button:hover {
+    background: rgba(67, 97, 238, 0.1);
+  }
+  
+  .filter-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--gray-dark);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-button:hover, .filter-button.active {
+    background: var(--primary);
+    color: white;
+  }
+  
+  /* Wyszukiwarka */
+  .search-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-dark);
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid var(--gray);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  }
+  
+  /* Filtry */
+  .filters-panel {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  
+  .filter-group {
+    margin-bottom: 1.2rem;
+  }
+  
+  .filter-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  .filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark);
+  }
+  
+  .filter-group select, .filter-group input[type="range"] {
+    width: 100%;
+  }
+  
+  .filter-group select {
+    padding: 0.7rem;
+    border: 1px solid var(--gray);
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .filter-group input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    background: var(--gray-light);
+    border-radius: 4px;
+    margin-top: 0.5rem;
+  }
+  
+  .filter-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Karty miejsc */
+  .places-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .place-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .place-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .place-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  
+  .like-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--gray-dark);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .like-button:hover, .like-button.liked {
+    color: var(--accent);
+  }
+  
+  .like-button.liked {
+    background: rgba(247, 37, 133, 0.2);
+  }
+  
+  .place-rating {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  
+  .place-info {
+    padding: 1.2rem;
+  }
+  
+  .place-info h3 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--dark);
+  }
+  
+  .place-location {
+    color: var(--gray-dark);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .place-distance {
+    color: var(--gray-dark);
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .place-category {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .place-category.historyczne {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary);
+  }
+  
+  .place-category.natura {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+  }
+  
+  .place-category.kultura {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+  }
+  
+  /* Brak wyników */
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .no-results p {
+    font-size: 1.1rem;
+    color: var(--gray-dark);
+    margin-bottom: 1.5rem;
+  }
+  
+  .reset-filters {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .reset-filters:hover {
+    background: var(--secondary);
+  }
+  
+  /* Responsywność */
+  @media (max-width: 768px) {
+    .explore-container {
+      padding: 1rem;
+    }
+    
+    .explore-header h1 {
+      font-size: 1.7rem;
+    }
+    
+    .places-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .places-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .filters-panel {
+      padding: 1rem;
+    }
+    
+    .filter-group label {
+      font-size: 0.9rem;
+    }
+  }

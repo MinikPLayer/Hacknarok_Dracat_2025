@@ -1,6 +1,8 @@
+// AddPlace.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaMapMarkerAlt, FaCamera, FaStar, FaArrowLeft, FaSave } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCamera, FaStar, FaArrowLeft, FaSave, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion'; // Dodano dla animacji
 import './newPlace.css';
 
 const AddPlace = () => {
@@ -10,74 +12,103 @@ const AddPlace = () => {
     location: '',
     description: '',
     rating: 0,
-    images: []
+    images: [],
   });
   const [previewImages, setPreviewImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setPlace(prev => ({ ...prev, [name]: value }));
+    setPlace((prev) => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + place.images.length > 5) {
-      alert('Możesz dodać maksymalnie 5 zdjęć');
+      setError('Możesz dodać maksymalnie 5 zdjęć.');
       return;
     }
 
-    const newImages = files.map(file => ({
+    const newImages = files.map((file) => ({
       file,
-      preview: URL.createObjectURL(file)
+      preview: URL.createObjectURL(file),
     }));
 
     setPreviewImages([...previewImages, ...newImages]);
-    setPlace(prev => ({ ...prev, images: [...prev.images, ...files] }));
+    setPlace((prev) => ({ ...prev, images: [...prev.images, ...files] }));
+    setError('');
   };
 
   const removeImage = (index) => {
-    const newImages = [...previewImages];
-    newImages.splice(index, 1);
-    setPreviewImages(newImages);
-    
-    const newFiles = [...place.images];
-    newFiles.splice(index, 1);
-    setPlace(prev => ({ ...prev, images: newFiles }));
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    setPlace((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   const handleRatingChange = (rating) => {
-    setPlace(prev => ({ ...prev, rating }));
+    setPlace((prev) => ({ ...prev, rating }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!place.name || !place.location) {
+      setError('Nazwa i lokalizacja są wymagane.');
+      return;
+    }
+
     setIsSubmitting(true);
-    
-    // Tutaj dodaj logikę wysyłania danych na serwer
-    console.log('Dodawane miejsce:', place);
-    
-    // Symulacja wysyłania
+    // Symulacja wysyłania danych
     setTimeout(() => {
       setIsSubmitting(false);
       alert('Miejsce zostało dodane pomyślnie!');
       navigate('/');
-    }, 1500);
+    }, 1000);
   };
 
   return (
-    <div className="add-place-container">
+    <motion.div
+      className="add-place-container"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="add-place-header">
-        <button className="back-button" onClick={() => navigate(-1)}>
+        <motion.button
+          className="back-button"
+          onClick={() => navigate(-1)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <FaArrowLeft /> Powrót
-        </button>
+        </motion.button>
         <h1>Dodaj nowe miejsce</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="place-form">
+      <motion.form
+        onSubmit={handleSubmit}
+        className="place-form"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        {error && (
+          <motion.div
+            className="error-message"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            {error}
+          </motion.div>
+        )}
+
         <div className="form-group">
           <label htmlFor="name">Nazwa miejsca*</label>
-          <input
+          <motion.input
             type="text"
             id="name"
             name="name"
@@ -85,6 +116,8 @@ const AddPlace = () => {
             onChange={handleInputChange}
             required
             placeholder="Wpisz nazwę miejsca"
+            whileFocus={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
           />
         </div>
 
@@ -92,27 +125,31 @@ const AddPlace = () => {
           <label htmlFor="location">Lokalizacja*</label>
           <div className="location-input">
             <FaMapMarkerAlt className="input-icon" />
-            <input
+            <motion.input
               type="text"
               id="location"
               name="location"
               value={place.location}
               onChange={handleInputChange}
               required
-              placeholder="Podaj lokalizację (adres lub współrzędne)"
+              placeholder="Podaj lokalizację"
+              whileFocus={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
             />
           </div>
         </div>
 
         <div className="form-group">
           <label htmlFor="description">Opis</label>
-          <textarea
+          <motion.textarea
             id="description"
             name="description"
             value={place.description}
             onChange={handleInputChange}
-            rows="4"
-            placeholder="Dodaj opis miejsca (co warto zobaczyć, atmosfera itp.)"
+            rows="5"
+            placeholder="Opisz, co sprawia, że to miejsce jest wyjątkowe..."
+            whileFocus={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
           />
         </div>
 
@@ -120,11 +157,17 @@ const AddPlace = () => {
           <label>Ocena</label>
           <div className="rating-container">
             {[1, 2, 3, 4, 5].map((star) => (
-              <FaStar
+              <motion.div
                 key={star}
-                className={`rating-star ${star <= place.rating ? 'active' : ''}`}
-                onClick={() => handleRatingChange(star)}
-              />
+                whileHover={{ scale: 1.2, rotate: 10 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <FaStar
+                  className={`rating-star ${star <= place.rating ? 'active' : ''}`}
+                  onClick={() => handleRatingChange(star)}
+                  aria-label={`Ocena ${star} gwiazdek`}
+                />
+              </motion.div>
             ))}
           </div>
         </div>
@@ -132,7 +175,12 @@ const AddPlace = () => {
         <div className="form-group">
           <label>Zdjęcia (max 5)</label>
           <div className="image-upload-container">
-            <label htmlFor="image-upload" className="upload-button">
+            <motion.label
+              htmlFor="image-upload"
+              className="upload-button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <FaCamera /> Dodaj zdjęcia
               <input
                 id="image-upload"
@@ -140,39 +188,70 @@ const AddPlace = () => {
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}
+                disabled={previewImages.length >= 5}
                 style={{ display: 'none' }}
               />
-            </label>
+            </motion.label>
             <span className="image-count">{previewImages.length}/5 zdjęć</span>
           </div>
 
-          {previewImages.length > 0 && (
-            <div className="image-previews">
-              {previewImages.map((image, index) => (
-                <div key={index} className="image-preview">
-                  <img src={image.preview} alt={`Preview ${index}`} />
-                  <button
-                    type="button"
-                    className="remove-image"
-                    onClick={() => removeImage(index)}
+          <AnimatePresence>
+            {previewImages.length > 0 && (
+              <motion.div
+                className="image-previews"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {previewImages.map((image, index) => (
+                  <motion.div
+                    key={index}
+                    className="image-preview"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+                    <img src={image.preview} alt={`Podgląd zdjęcia ${index + 1}`} />
+                    <motion.button
+                      type="button"
+                      className="remove-image"
+                      onClick={() => removeImage(index)}
+                      whileHover={{ scale: 1.1, rotate: 90 }}
+                      whileTap={{ scale: 0.9 }}
+                      aria-label="Usuń zdjęcie"
+                    >
+                      <FaTimes />
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <button type="submit" className="submit-button" disabled={isSubmitting}>
-          {isSubmitting ? 'Zapisywanie...' : (
+        <motion.button
+          type="submit"
+          className="submit-button"
+          disabled={isSubmitting}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          {isSubmitting ? (
+            <motion.span
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            >
+              Zapisywanie...
+            </motion.span>
+          ) : (
             <>
               <FaSave /> Zapisz miejsce
             </>
           )}
-        </button>
-      </form>
-    </div>
+        </motion.button>
+      </motion.form>
+    </motion.div>
   );
 };
 

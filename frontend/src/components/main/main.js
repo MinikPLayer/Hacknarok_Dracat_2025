@@ -10,7 +10,9 @@ import {
   FaStar, 
   FaMapMarkerAlt,
   FaPlus,
-  FaCompass
+  FaTrophy,
+  FaBookOpen,
+  FaCompass 
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
@@ -54,7 +56,7 @@ const Main = () => {
                 transition={{ duration: 0.5 }}
             >
                 <div className="header-content">
-                    <h1>Witaj ponownie, <span className="highlight">Podróżniku</span>!</h1>
+                    <h1>Witaj ponownie, <span className="highlightMain">Podróżniku</span>!</h1>
                     <p className="subtitle">Twoja podróż trwa dalej...</p>
                     <div className="header-decoration"></div>
                 </div>
@@ -76,57 +78,122 @@ const Main = () => {
 
             {/* Szybkie akcje */}
             <section className="quick-actions">
-                <motion.button 
-                    className="action-card primary"
-                    onClick={() => navigate('/ranking')}
+            <motion.button 
+                className="action-card primary"
+                onClick={() => navigate('/ranking')}
+                whileHover={{ y: -5 }}
+                whileTap={{ scale: 0.98 }}
+            >
+                <div className="action-icon">
+                    <FaMedal /> {/* Ikona medalu dla rankingu */}
+                </div>
+                <div className="action-content">
+                    <h3>Ranking</h3>
+                    <p>Zobacz swoją pozycję wśród znajomych</p>
+                </div>
+                <span className="action-arrow"><FaArrowRight /></span>
+            </motion.button>
+
+            <motion.button 
+                className="action-card secondary"
+                onClick={() => navigate('/form')}
+                whileHover={{ y: -5 }}
+                whileTap={{ scale: 0.98 }}
+            >
+                <div className="action-icon">
+                    <FaRoute /> {/* Ikona trasy dla nowej podróży */}
+                </div>
+                <div className="action-content">
+                    <h3>Nowa podróż</h3>
+                    <p>Zaplanuj swoją następną podróż</p>
+                </div>
+                <span className="action-arrow"><FaArrowRight /></span>
+            </motion.button>
+
+            <motion.button 
+                className="action-card cat-card"
+                onClick={() => navigate('/newPlace')}
+                whileHover={{ y: -5, rotate: -2 }}
+                whileTap={{ scale: 0.98 }}
+            >
+                <div className="action-icon">
+                    <img 
+                        src="/media/kotsppanko.png" 
+                        alt="Dodaj nowe miejsce" 
+                        className="cat-icon"
+                    /> {/* Ikona kota dla dodania nowego miejsca */}
+                </div>
+                <div className="action-content">
+                    <h3>Dodaj nowe miejsce</h3>
+                    <p>Podziel się swoimi ulubionymi miejscówkami</p>
+                </div>
+                <span className="action-arrow"><FaArrowRight /></span>
+            </motion.button>
+            </section>
+
+            <section className="quick-actions">
+                {/* Sekcja szybkich akcji - zaktualizowana */}
+            <section className="quick-actions">
+            {/* Osiągnięcia */}
+            <motion.button
+                    className="action-card achievement-card"
+                    onClick={() => navigate('/achievements')}
                     whileHover={{ y: -5 }}
                     whileTap={{ scale: 0.98 }}
+                    aria-label="Przejdź do osiągnięć"
                 >
                     <div className="action-icon">
-                        <FaMedal />
+                    <FaTrophy className="custom-icon" />
                     </div>
                     <div className="action-content">
-                        <h3>Ranking</h3>
-                        <p>Zobacz swoją pozycję wśród znajomych</p>
+                    <h3>Osiągnięcia</h3>
+                    <p>Odkryj swoje zdobyte odznaki i wyróżnienia</p>
                     </div>
-                    <span className="action-arrow"><FaArrowRight /></span>
+                    <span className="action-arrow">
+                    <FaArrowRight />
+                    </span>
                 </motion.button>
 
-                <motion.button 
-                    className="action-card secondary"
-                    onClick={() => navigate('/form')}
+                {/* Moje historie */}
+                <motion.button
+                    className="action-card story-card"
+                    onClick={() => navigate('/storyTelling')}
                     whileHover={{ y: -5 }}
                     whileTap={{ scale: 0.98 }}
+                    aria-label="Przejdź do historii"
                 >
                     <div className="action-icon">
-                        <FaRoute />
+                    <FaBookOpen className="custom-icon" />
                     </div>
                     <div className="action-content">
-                        <h3>Nowa podróż</h3>
-                        <p>Zaplanuj swoją następną podróż</p>
+                    <h3>Moje historie</h3>
+                    <p>Twórz i dziel się wspomnieniami z podróży</p>
                     </div>
-                    <span className="action-arrow"><FaArrowRight /></span>
+                    <span className="action-arrow">
+                    <FaArrowRight />
+                    </span>
                 </motion.button>
 
-                <motion.button 
-                    className="action-card cat-card"
-                    onClick={() => navigate('/newPlace')}
-                    whileHover={{ y: -5, rotate: -2 }}
+                {/* Odkrywaj */}
+                <motion.button
+                    className="action-card explore-card"
+                    onClick={() => navigate('/explore')}
+                    whileHover={{ y: -5 }}
                     whileTap={{ scale: 0.98 }}
+                    aria-label="Odkrywaj nowe miejsca"
                 >
                     <div className="action-icon">
-                        <img 
-                            src="/media/kotsppanko.png" 
-                            alt="Dodaj nowe miejsce" 
-                            className="cat-icon"
-                        />
+                    <FaCompass className="custom-icon" />
                     </div>
                     <div className="action-content">
-                        <h3>Dodaj nowe miejsce</h3>
-                        <p>Podziel się swoimi ulubionymi miejscówkami</p>
+                    <h3>Odkrywaj</h3>
+                    <p>Znajdź nowe, fascynujące miejsca</p>
                     </div>
-                    <span className="action-arrow"><FaArrowRight /></span>
+                    <span className="action-arrow">
+                    <FaArrowRight />
+                    </span>
                 </motion.button>
+            </section>
             </section>
 
             {/* Sekcja ostatniej podróży */}

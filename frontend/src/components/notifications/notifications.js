@@ -33,7 +33,20 @@ const DetailPanel = styled(Box)(({ theme }) => ({
   boxShadow: theme.shadows[2],
   height: "calc(100vh - 260px)",
   position: "sticky",
-  top: "20px"
+  top: "20px",
+  display: "flex",
+  flexDirection: "column"
+}));
+
+const OwlIcon = styled('img')(({ theme }) => ({
+  width: '120px',
+  height: 'auto',
+  margin: '0 auto',
+  opacity: 0.7,
+  filter: 'grayscale(30%)',
+  [theme.breakpoints.down('sm')]: {
+    width: '80px'
+  }
 }));
 
 const Notifications = () => {
@@ -81,23 +94,46 @@ const Notifications = () => {
   const endIndex = startIndex + perPage;
   const paginatedNotifications = filteredNotifications.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredNotifications.length / perPage);
-const handleDelete = (id) => {
+
+  const handleDelete = (id) => {
     setNotifications(notifications.filter(n => n.id !== id));
     if (selectedNotification?.id === id) setSelectedNotification(null);
   };
 
   return (
     <Box sx={{ maxWidth: 1200, margin: "0 auto", p: 3 }}>
-      <Typography variant="h4" sx={{
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 2, 
         mb: 4,
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        color: "text.primary"
+        position: 'relative'
       }}>
-        <CircleNotifications fontSize="large" />
-        Powiadomienia
-      </Typography>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          flex: 1,
+          gap: 2
+        }}>
+          <CircleNotifications fontSize="large" sx={{ color: 'black' }} />
+          <Typography variant="h4" sx={{ color: "text.primary" }}>
+            Powiadomienia
+          </Typography>
+        </Box>
+        <Box sx={{
+          position: 'absolute',
+          right: 0,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          height: '60px'
+        }}>
+          <img 
+            src="/media/sowanowa.png" 
+            alt="Owl icon" 
+            style={{ height: '100%', width: 'auto' }}
+          />
+        </Box>
+      </Box>
 
       <TextField
         fullWidth
@@ -138,7 +174,7 @@ const handleDelete = (id) => {
                   sx={{
                     bgcolor: notification.read ? 'action.hover' : 'background.paper',
                     borderLeft: selectedNotification?.id === notification.id ?
-                      "4px solid black": "none"
+                      "4px solid black" : "none"
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: "40px" }}>
@@ -229,12 +265,14 @@ const handleDelete = (id) => {
           ) : (
             <Box
               display="flex"
+              flexDirection="column"
               alignItems="center"
               justifyContent="center"
               height="100%"
               textAlign="center"
             >
-              <Typography variant="h6" color="text.secondary">
+              <OwlIcon src="/media/sowanowa.png" alt="Owl" />
+              <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
                 Wybierz powiadomienie, aby zobaczyć szczegóły
               </Typography>
             </Box>

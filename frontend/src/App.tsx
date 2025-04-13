@@ -20,6 +20,10 @@ import RankingPage from './components/ranking/ranking';
 import LlamaChat from "./components/llamaChat/llamaChat";
 import WorldResults from "./components/llamaChat/worldResults";
 import AddPlace from './components/newPlace/newPlace';
+import TripsPage from './components/tripsPage/tripsPage';
+import StorytellingPage from './components/storyTelling/storyTelling';
+import ExplorePage from './components/explore/explore';
+import AchievementsPage from './components/achievements/achievements';
 
 
 function App() {
@@ -48,6 +52,10 @@ function App() {
                         <Route path="/chat" element={<LlamaChat/>}/>
                         <Route path="/worlds" element={<WorldResults/>}/>
                         <Route path='/newPlace' element={<AddPlace/>}/>
+                        <Route path='/trips' element={<TripsPage/>}/>
+                        <Route path='/storyTelling' element={<StorytellingPage/>}/>
+                        <Route path="/explore" element={<ExplorePage/>}/>
+                        <Route path="/achievements" element={<AchievementsPage/>}/>
 
 
                     </Routes>

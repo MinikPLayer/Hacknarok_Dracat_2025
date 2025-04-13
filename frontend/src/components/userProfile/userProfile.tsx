@@ -37,8 +37,7 @@ const ProfileContainer = styled(Box)(({ theme }) => ({
 }));
 
 const ProfileCard = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: theme.shape.borderRadius || '8px',
   padding: theme.spacing(3),
   boxShadow: "black",
   flex: 1,
@@ -52,13 +51,12 @@ const StatsCard = styled(ProfileCard)({
 });
 
 const AchievementIcon = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.light,
-  color: theme.palette.primary.contrastText,
+  background: `linear-gradient(45deg, #1976d2, #ff4081)`, // Zamieniono primary.main na #1976d2
+  color: '#ffffff', 
   '&:hover': {
-    backgroundColor: theme.palette.primary.main
-  }
+    background: `linear-gradient(45deg, #3f37c9 #ff4081}, #1976d2)`, // Odwrócony gradient na hover
+  },
 }));
-
 const BioTextArea = styled(TextField)({
   width: '100%',
   '& .MuiOutlinedInput-root': {
