@@ -1,5 +1,6 @@
 import 'package:confetti/confetti.dart';
 import 'package:dracat_hacknarok_2025/components/location_card.dart';
+import 'package:dracat_hacknarok_2025/components/location_details_component.dart';
 import 'package:dracat_hacknarok_2025/model/location_model.dart';
 import 'package:dracat_hacknarok_2025/model/trip_model.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
@@ -33,6 +34,8 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
   final TextEditingController tripNamecontroller = TextEditingController();
 
   List<LocationSwiperCardEntry> selectedEntries = [];
+
+  LocationModel? openedDetailsLocation;
 
   @override
   void initState() {
@@ -250,10 +253,22 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
       );
     }
 
+    if (openedDetailsLocation != null) {
+      return LocationDetailsComponent(
+        isReached: false,
+        locationName: openedDetailsLocation?.name ?? "Target",
+        onBackPressed: () {
+          setState(() {
+            openedDetailsLocation = null;
+          });
+        },
+      );
+    }
+
     return CardSwiper(
       isLoop: false,
       cardsCount: locations.length,
-      allowedSwipeDirection: AllowedSwipeDirection.only(left: true, right: true),
+      allowedSwipeDirection: AllowedSwipeDirection.only(left: true, right: true, up: true),
       threshold: 90,
       onEnd: () => setState(() {
         if (selectedEntries.isEmpty) {
@@ -279,6 +294,13 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
         confettiController2.play();
       }),
       onSwipe: (previousIndex, currentIndex, direction) async {
+        if (direction == CardSwiperDirection.top) {
+          setState(() {
+            openedDetailsLocation = locations[currentIndex!].location;
+          });
+          return false;
+        }
+
         if (direction == CardSwiperDirection.right) {
           selectedEntries.add(locations[previousIndex]);
         }

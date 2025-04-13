@@ -109,6 +109,14 @@ class _MapComponentState extends State<MapPage> {
                               ),
                             Text("Latitude: ${landmark.location.latitude}"),
                             Text("Longitude: ${landmark.location.longitude}"),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  currentlyVisitingWaypoint = landmark;
+                                });
+                              },
+                              child: Text("Visit now"),
+                            )
                           ],
                         ),
                       ),
@@ -264,7 +272,8 @@ class _MapComponentState extends State<MapPage> {
 
     if (currentlyVisitingWaypoint != null) {
       return LocationDetailsComponent(
-        location: currentlyVisitingWaypoint!,
+        isReached: true,
+        locationName: currentlyVisitingWaypoint?.name ?? "Target location",
         onBackPressed: () {
           setState(() {
             tripProvider.flagWaypointAsVisited(currentlyVisitingWaypoint!, userProvider.currentUserLocation);
