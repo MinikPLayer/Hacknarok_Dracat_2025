@@ -4,6 +4,8 @@ import 'package:dracat_hacknarok_2025/pages/location_swiper_page.dart';
 import 'package:dracat_hacknarok_2025/utils/map_utils.dart';
 import 'package:flutter/material.dart';
 
+import 'package:flutter/services.dart' show rootBundle;
+
 class LocationDetailsComponent extends StatefulWidget {
   final String locationName;
   final Function onBackPressed;
@@ -64,6 +66,14 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
     "One main attraction 'does the job': Opinions on the overall experience are mixed, but nearly everyone is impressed by one specific main attraction (e.g., an impressive castle, a unique museum, a spectacular national park). Visitors often come primarily for this single highlight, finding the rest less interesting or underdeveloped."
   ];
 
+  int calculateSeed(String name) {
+    int seed = 0;
+    for (int i = 0; i < name.length; i++) {
+      seed += name.codeUnitAt(i) * (i + 1);
+    }
+    return seed;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,17 +91,17 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
               if (widget.isReached)
                 Text(
                   "Congratulations!",
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               if (widget.isReached)
                 Text(
                   "You have reached:",
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               if (widget.isReached)
                 Text(
                   widget.locationName,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
@@ -103,7 +113,7 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
                       ? [
                           const Text(
                             "Thank you for sharing your photo! ❤️",
-                            style: TextStyle(fontSize: 24),
+                            style: TextStyle(fontSize: 16),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -148,13 +158,13 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "AI Summary of reviews:",
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                     SizedBox(
                       width: 400,
                       child: Text(
-                        llmSummaries[Random().nextInt(llmSummaries.length)],
+                        llmSummaries[Random(calculateSeed(widget.locationName)).nextInt(llmSummaries.length)],
                         softWrap: true,
                       ),
                     ),
@@ -162,7 +172,7 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "People who reached this location.",
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                     SizedBox(
@@ -177,7 +187,7 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
                               Image(
                                 width: 200,
                                 height: 200,
-                                image: NetworkImage("http://hack.mtomecki.pl/influencer.gif"),
+                                image: AssetImage("assets/influencer.gif"),
                               ),
                               Text(
                                 userNames[x % userNames.length],
