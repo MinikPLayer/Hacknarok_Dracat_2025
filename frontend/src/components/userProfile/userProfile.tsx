@@ -1,14 +1,72 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import './userProfile.css';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { FaMedal, FaTrophy, FaStar, FaCrown } from 'react-icons/fa';
-import client from '../../client'; 
-import { API_BASE_URL } from '../../config'; 
-import {Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
+import { FaMedal, FaTrophy, FaStar, FaCrown, FaLink } from 'react-icons/fa';
+import {
+  Avatar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Box,
+  Typography,
+  TextField,
+  useMediaQuery,
+  useTheme,
+  IconButton,
+  Chip,
+  CircularProgress
+} from "@mui/material";
 import QRCode from "react-qr-code";
 import Cropper from "react-easy-crop";
+import { styled } from '@mui/system';
+import client from '../../client';
+import { API_BASE_URL } from '../../config';
 import {FaPencil} from "react-icons/fa6";
 
+// Styled components
+const ProfileContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(4),
+  padding: theme.spacing(4),
+  [theme.breakpoints.up('md')]: {
+    flexDirection: 'row',
+    alignItems: 'flex-start'
+  }
+}));
+
+const ProfileCard = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(3),
+  boxShadow: "black",
+  flex: 1,
+  minWidth: 0
+}));
+
+const StatsCard = styled(ProfileCard)({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '24px'
+});
+
+const AchievementIcon = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.light,
+  color: theme.palette.primary.contrastText,
+  '&:hover': {
+    backgroundColor: theme.palette.primary.main
+  }
+}));
+
+const BioTextArea = styled(TextField)({
+  width: '100%',
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px'
+  }
+});
+
+// Interfaces
 interface UserData {
   id?: string;
   username?: string;
@@ -74,18 +132,38 @@ async function getCroppedImg(imageSrc: string, croppedAreaPixels: { x: number; y
 }
 
 const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const [profileImage, setProfileImage] = useState<string>('/images/basic/user_no_picture.png');
   const [friends, setFriends] = useState<string[]>(['Jan Kowalski', 'Anna Nowak', 'Piotr Zieliński']);
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [qrCodeValue, setQrCodeValue] = useState('');
   const [hover, setHover] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [crop, setCrop] = useState({x: 0, y: 0});
-  const token = localStorage.getItem("access")
   const [zoom, setZoom] = useState(1);
   const [showCropModal, setShowCropModal] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("access");
+
+  // Mock data
+  const monthlyVisits: VisitData[] = [
+    { month: 'Sty', visits: 40 },
+    { month: 'Lut', visits: 30 },
+    { month: 'Mar', visits: 50 },
+    { month: 'Kwi', visits: 70 },
+    { month: 'Maj', visits: 90 },
+  ];
+
+  const genreData: GenreData[] = [
+    { name: 'Fantasy', value: 40 },
+    { name: 'Sci-Fi', value: 30 },
+    { name: 'Horror', value: 20 },
+    { name: 'Historyczne', value: 10 },
+  ];
 
   const onCropComplete = useCallback(
     (_: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
@@ -116,7 +194,7 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
 
       const response = await client.post(`${API_BASE_URL}user/`, formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('access')}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -130,52 +208,24 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
     }
   };
 
-  // Mock data
-  const monthlyVisits: VisitData[] = [
-    { month: 'Styczeń', visits: 40 },
-    { month: 'Luty', visits: 30 },
-    { month: 'Marzec', visits: 50 },
-    { month: 'Kwiecień', visits: 70 },
-    { month: 'Maj', visits: 90 },
-  ];
-
-  const genreData: GenreData[] = [
-    { name: 'Fantasy', value: 40 },
-    { name: 'Sci-Fi', value: 30 },
-    { name: 'Horror', value: 20 },
-    { name: 'Historyczne', value: 10 },
-  ];
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 992);
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  
   useEffect(() => {
     if (userData?.friends && userData.friends.length > 0) {
       setFriends(userData.friends);
     }
-}, [userData]);
+  }, [userData]);
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setLoading(true);
       try {
         const storedImage = localStorage.getItem('profile_picture');
         if (storedImage) {
           setProfileImage(storedImage);
-          return;
         }
 
         const response = await client.get(`${API_BASE_URL}/user/`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('access')}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -186,32 +236,15 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
       } catch (error) {
         console.error('Błąd podczas pobierania danych użytkownika:', error);
         setProfileImage('/images/basic/user_no_picture.png');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-        try {
-            const response = await client.get(API_BASE_URL + "user/", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setUserData(response.data);
-            console.log("Zalogowano");
-            console.log(response.data);
-        } catch (error) {
-            console.log("Nie udało się zalogować");
-        }
-    };
-
     if (token) {
-        fetchUserData();
+      fetchUserData();
     }
-}, [token]);
+  }, [token]);
 
   useEffect(() => {
     if (isOwnProfile && userData?.id) {
@@ -221,7 +254,7 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
     }
   }, [isOwnProfile, userData?.id]);
 
-  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleBioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData(prev => prev ? { ...prev, bio: e.target.value } : null);
   };
 
@@ -235,40 +268,44 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
       .catch(() => alert('Błąd podczas kopiowania linku!'));
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <div className="profile-container">
-      <div className="profile-columns">
-        {/* Left Column - Profile Info */}
-        <div className="left-column">
-          <div className="profile-header">
-            <div
-              onMouseEnter={() => setHover(true)}
-              onMouseLeave={() => setHover(false)}
-              style={{ position: 'relative' }}
-            >
+    <ProfileContainer>
+      {/* Left Column - Profile Info */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
+        <ProfileCard>
+          <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={3}>
+            <Box position="relative" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
               <Avatar
                 src={profileImage}
                 sx={{
-                  width: isSmallScreen ? 60 : 80,
-                  height: isSmallScreen ? 60 : 80,
+                  width: 120,
+                  height: 120,
                   filter: hover ? 'brightness(0.8)' : 'none',
                   transition: 'filter 0.3s'
                 }}
               />
               {hover && isOwnProfile && (
                 <>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
+                  <Box
+                    position="absolute"
+                    top="50%"
+                    left="50%"
+                    sx={{
                       transform: 'translate(-50%, -50%)',
                       cursor: 'pointer',
                     }}
                     onClick={() => document.getElementById('avatarInput')?.click()}
                   >
                     <FaPencil style={{ color: 'white', fontSize: '24px' }} />
-                  </div>
+                  </Box>
                   <input
                     id="avatarInput"
                     type="file"
@@ -278,112 +315,145 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
                   />
                 </>
               )}
-            </div>
+            </Box>
 
-            <div className="profile-info">
-            <h2 className="name">{userData?.username || 'Użytkownik'}</h2>
-            <p className="rank-title">{userData?.rank || 'Nowy użytkownik'} • {userData?.title || 'Podróżnik'}</p>
-            <p className="email">Email: {userData?.email || 'Brak danych'}</p>
-            <p className="telephone">Telefon: {userData?.telephone || 'Brak danych'}</p>
-            <p className="address">Adres: {userData?.address || 'Brak danych'}</p>
-            <p className="full-name">Imię i nazwisko: {userData?.name || 'Nie podano'} {userData?.surname || ''}</p>
-          </div>
-          </div>
+            <Box flex={1}>
+              <Typography variant="h4" fontWeight="bold">
+                {userData?.username || 'Użytkownik'}
+              </Typography>
+              <Box display="flex" gap={1} my={1}>
+                <Chip label={userData?.rank || 'Nowy'} color="primary" size="small" />
+                <Chip label={userData?.title || 'Podróżnik'} variant="outlined" size="small" />
+              </Box>
 
-          <hr className="divider" />
+              <Box mt={2}>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Email:</strong> {userData?.email || 'Brak danych'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Telefon:</strong> {userData?.telephone || 'Brak danych'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Imię i nazwisko:</strong> {userData?.name || 'Nie podano'} {userData?.surname || ''}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
 
-          <div className="achievements">
-            <FaMedal className="achievement-icon" title="Osiągnięcie 1" />
-            <FaTrophy className="achievement-icon" title="Osiągnięcie 2" />
-            <FaStar className="achievement-icon" title="Osiągnięcie 3" />
-            <FaCrown className="achievement-icon" title="Osiągnięcie 4" />
-          </div>
+          <Box display="flex" justifyContent="center" gap={2} mt={3}>
+            <AchievementIcon>
+              <FaMedal />
+            </AchievementIcon>
+            <AchievementIcon>
+              <FaTrophy />
+            </AchievementIcon>
+            <AchievementIcon>
+              <FaStar />
+            </AchievementIcon>
+            <AchievementIcon>
+              <FaCrown />
+            </AchievementIcon>
+          </Box>
 
-          <div className="bio-section">
-            <h3>BIO</h3>
+          <Box mt={3}>
+            <Typography variant="h6" mb={1}>Bio</Typography>
             {isOwnProfile ? (
-              <textarea
-                className="bio-text-editable"
+              <BioTextArea
+                multiline
+                rows={4}
                 value={userData?.bio || ''}
                 onChange={handleBioChange}
                 placeholder="Dodaj swój opis..."
+                variant="outlined"
               />
             ) : (
-              <button className="challenge-button" onClick={handleChallengeClick}>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleChallengeClick}
+                sx={{ borderRadius: '12px' }}
+              >
                 Wyślij wyzwanie
-              </button>
+              </Button>
             )}
-          </div>
+          </Box>
+        </ProfileCard>
 
-          <hr className="divider" />
+        <ProfileCard>
+          <Typography variant="h6" mb={2}>Znajomi</Typography>
+          <Box display="flex" flexDirection="column" gap={1}>
+            {friends.map((friend, index) => (
+              <Box key={index} display="flex" alignItems="center" p={1} sx={{
+                borderRadius: '8px',
+                '&:hover': { backgroundColor: 'action.hover' }
+              }}>
+                <Avatar sx={{ width: 32, height: 32, mr: 1 }} />
+                <Typography>{friend}</Typography>
+              </Box>
+            ))}
+          </Box>
 
-          <div className="friends-section">
-            <h3>Znajomi</h3>
-            <ul className="friends-list">
-              {friends.map((friend, index) => (
-                <li key={index} className="friend-item">
-                  {friend}
-                </li>
-              ))}
-            </ul>
-
-            {isOwnProfile && qrCodeValue && (
-              <div className="qr-code-section">
-                <h4>Udostępnij swój kod QR</h4>
-                <div className="qr-code-wrapper">
-                  <QRCode value={qrCodeValue} size={100} />
-                </div>
-                <p className="qr-code-instruction">Zeskanuj kod QR, aby dodać znajomego!</p>
-                <button className="copy-link-button" onClick={copyToClipboard}>
+          {isOwnProfile && qrCodeValue && (
+            <Box mt={3} textAlign="center">
+              <Typography variant="h6" mb={1}>Udostępnij swój profil</Typography>
+              <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                <Box p={2} bgcolor="white" borderRadius="8px">
+                  <QRCode value={qrCodeValue} size={120} />
+                </Box>
+                <Button
+                  variant="outlined"
+                  startIcon={<FaLink />}
+                  onClick={copyToClipboard}
+                  sx={{ borderRadius: '20px' }}
+                >
                   Skopiuj link
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </ProfileCard>
+      </Box>
 
-        {/* Right Column - Statistics */}
-        <div className="right-column">
-          <div className="statistics-section">
-            <h3>Statystyki</h3>
+      {/* Right Column - Statistics */}
+      <StatsCard sx={{ flex: isMobile ? 1 : 1.5 }}>
+        <Typography variant="h5" fontWeight="bold">Statystyki</Typography>
 
-            <div className="chart-container">
-              <h4>Miesięczne odwiedziny</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={monthlyVisits}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="visits" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+        <Box>
+          <Typography variant="subtitle1" mb={1}>Miesięczne odwiedziny</Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={monthlyVisits}>
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="visits" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Box>
 
-            <div className="chart-container">
-              <h4>Najczęściej uczęszczane gatunki</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Tooltip />
-                  <Pie
-                    data={genreData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    label
-                  >
-                    {genreData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Box>
+          <Typography variant="subtitle1" mb={1}>Ulubione gatunki</Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Tooltip />
+              <Pie
+                data={genreData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                innerRadius={40}
+                fill="#8884d8"
+                label
+              >
+                {genreData.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </Box>
+      </StatsCard>
 
       <Dialog
         open={showCropModal}
@@ -392,15 +462,17 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
           sx: {
             width: '90%',
             maxWidth: '600px',
-            borderRadius: 2
+            borderRadius: 2,
+            overflow: 'hidden'
           }
         }}
       >
         <DialogTitle sx={{
           typography: 'h6',
-          bgcolor: 'background.default',
+          bgcolor: 'background.paper',
           borderBottom: '1px solid',
-          borderColor: 'divider'
+          borderColor: 'divider',
+          py: 2
         }}>
           Edycja zdjęcia profilowego
         </DialogTitle>
@@ -408,7 +480,8 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
         <DialogContent sx={{
           position: 'relative',
           height: '400px',
-          bgcolor: 'background.paper'
+          bgcolor: 'background.default',
+          p: 0
         }}>
           {imageSrc && (
             <Cropper
@@ -426,13 +499,16 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
         </DialogContent>
 
         <DialogActions sx={{
-          bgcolor: 'background.default',
+          bgcolor: 'background.paper',
           borderTop: '1px solid',
-          borderColor: 'divider'
+          borderColor: 'divider',
+          px: 3,
+          py: 2
         }}>
           <Button
             onClick={() => setShowCropModal(false)}
             color="inherit"
+            sx={{ borderRadius: '8px' }}
           >
             Anuluj
           </Button>
@@ -440,12 +516,13 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
             onClick={handleCropSave}
             variant="contained"
             disableElevation
+            sx={{ borderRadius: '8px' }}
           >
             Zapisz zmiany
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </ProfileContainer>
   );
 };
 

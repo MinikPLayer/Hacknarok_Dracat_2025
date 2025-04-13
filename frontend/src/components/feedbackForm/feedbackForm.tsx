@@ -93,7 +93,7 @@ const FeedbackForm = () => {
 
                             <form onSubmit={handleSubmit}>
                                 <Box mb={4} py={3}>
-                                    <Typography variant="h6">Ocena trasy</Typography>
+                                    <Typography variant="h6">Ocena punktu</Typography>
                                     <Rating
                                         name="rating"
                                         value={rating}
@@ -185,18 +185,18 @@ const FeedbackForm = () => {
                                     variant="outlined"
                                     style={{color: "#22252c", borderColor: "#22252c"}}
                                     size="large"
-                                    onClick={() => navigate('/form')}
+                                    onClick={() => navigate('/map')}
                                     sx={{}}
                                 >
-                                    Nowa trasa
+                                    Wróć do trasy
                                 </Button>
                                 <Button
                                     variant="contained"
                                     style={{backgroundColor: "#22252c"}}
                                     size="large"
-                                    onClick={() => navigate('/main')}
+                                    onClick={() => navigate('/worlds')}
                                 >
-                                    Wróć do menu
+                                    Zakończ
                                 </Button>
                             </Box>
                         </Box>

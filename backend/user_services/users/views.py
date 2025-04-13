@@ -140,7 +140,7 @@ class LlamaGenerateView(APIView):
         combined_reviews = "\n".join(f"- {text}" for text in wrazenia.values())
 
         # Prompt do Mistrala
-        prompt = f"""Przeczytaj podane opisy miejsc odwiedzonych przez użytkownika i na ich podstawie stwórz krótki opis (2-3 zdania), który może umieścić na portalu społecznościowym jako streszczenie swojej podróży (napisz ciągły tekst, unikaj numeracji i brzmij jak człowiek):
+        prompt = f"""Przeczytaj podane opisy miejsc odwiedzonych przez użytkownika i na ich podstawie stwórz krótki opis (2-3 zdania), który może umieścić na portalu społecznościowym jako streszczenie swojej podróży (napisz ciągły tekst, nie używaj numeracji i brzmij jak człowiek):
     {combined_reviews}
     """
 
