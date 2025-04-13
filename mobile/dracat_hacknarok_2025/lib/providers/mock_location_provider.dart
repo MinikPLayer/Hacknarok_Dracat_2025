@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:dracat_hacknarok_2025/model/location_entry.dart';
+import 'package:dracat_hacknarok_2025/model/location_model.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 

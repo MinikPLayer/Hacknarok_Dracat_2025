@@ -1,88 +1,103 @@
+import 'package:dracat_hacknarok_2025/dialogs/location_mode_dialog.dart';
 import 'package:dracat_hacknarok_2025/pages/map_page.dart';
 import 'package:dracat_hacknarok_2025/pages/location_swiper_page.dart';
-import 'package:dracat_hacknarok_2025/provider/mock_location_provider.dart';
+import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
+import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
+import 'package:dracat_hacknarok_2025/providers/mock_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  var locationProvider = MockLocationProvider();
+  var userProvider = MockUserProvider();
+  var tripProvider = MockTripProvider();
+
+  var userAwait = userProvider.init();
+  var tripAwait = tripProvider.init();
+
+  await userAwait;
+  await tripAwait;
+
+  runApp(MyApp(
+    locationProvider: locationProvider,
+    userProvider: userProvider,
+    tripProvider: tripProvider,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final MockLocationProvider locationProvider;
+  final MockUserProvider userProvider;
+  final MockTripProvider tripProvider;
+
+  static const String appTitle = '9 stron światów';
+
+  const MyApp({super.key, required this.locationProvider, required this.userProvider, required this.tripProvider});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: appTitle,
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: ChangeNotifierProvider(
-        create: (context) => MockLocationProvider(),
-        child: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<MockLocationProvider>(
+            create: (context) => locationProvider,
+          ),
+          ChangeNotifierProvider<MockUserProvider>(
+            create: (context) => userProvider,
+          ),
+          ChangeNotifierProvider<MockTripProvider>(
+            create: (context) => tripProvider,
+          ),
+        ],
+        child: const MyHomePage(title: appTitle),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int currentPage = 0;
-
-  @override
   Widget build(BuildContext context) {
-    Widget? bodyWidget;
+    var userProvider = Provider.of<MockUserProvider>(context, listen: true);
+    if (userProvider.getAllowLocationStatus() == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (context) => LocationModeDialog(
+            userProvider: userProvider,
+          ),
+        );
+      });
 
-    switch (currentPage) {
-      case 0:
-        bodyWidget = LocationSwiperPage();
-        break;
-      case 1:
-        bodyWidget = MapPage();
-        break;
-      case 2:
-        bodyWidget = Text('User Page');
-        break;
-      default:
-        bodyWidget = Text('Swipe Page');
-        break;
+      return Scaffold(
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text("Waiting for user interaction..."),
+              ),
+              CircularProgressIndicator(),
+            ],
+          ),
+        ),
+      );
     }
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary, title: Text(widget.title)),
-      body: Center(child: bodyWidget),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.swipe), label: 'Swipe'),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'User'),
-        ],
-        currentIndex: currentPage,
-        onTap: (index) {
-          setState(() {
-            currentPage = index;
-          });
-        },
-      ),
+      body: Center(child: LocationSwiperPage()),
     );
   }
 }
