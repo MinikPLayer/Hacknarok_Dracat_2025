@@ -127,13 +127,39 @@ class MapTrip {
 }
 
 class MapUtils {
-  // TODO: Fix path including user position.
-  // Instead calculate the path without user position and add it to the start of the path.
-  static Future<MapTrip> getTripBetweenPoints(LatLng userPos, List<LatLng> points) async {
-    var fullPath = List.from(points);
-    // Inverted addition order to avoid reallocation
-    fullPath.insert(0, userPos);
+  static Future<MapRoute> getRouteBetweenTwoPoints(LatLng start, LatLng end) async {
+    var response = await http.get(
+      Uri.parse(
+        'https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson&steps=true&annotations=true',
+      ),
+    );
 
+    var responseJson = jsonDecode(response.body);
+    var osrmTrip = OSRMTrip.fromJson(responseJson["routes"][0]);
+    var mapRoute = MapRoute(steps: osrmTrip.geometry!.coordinates);
+
+    return mapRoute;
+  }
+
+  static Future<MapTrip> getTripBetweenPoints(List<LatLng> points, {bool skipReturn = false}) async {
+    if (points.isEmpty) {
+      return MapTrip(routes: [], waypoints: []);
+    }
+
+    // TODO: Download OSRM waypoint data only one point is given.
+    if (points.length == 1) {
+      return MapTrip(routes: [], waypoints: [
+        OSRMWaypoint(
+          location: points[0],
+          name: "Target",
+          hint: null,
+          distance: null,
+          waypointIndex: 1,
+        ),
+      ]);
+    }
+
+    var fullPath = List.from(points);
     var coordString = "";
     for (var i = 0; i < fullPath.length; i++) {
       coordString += "${fullPath[i].longitude},${fullPath[i].latitude}";
@@ -154,5 +180,15 @@ class MapUtils {
     var mapTrip = MapTrip.fromOSRMTrip(osrmTrip, osrmWaypoints);
 
     return mapTrip;
+  }
+
+  // TODO: Fix path including user position.
+  // Instead calculate the path without user position and add it to the start of the path.
+  static Future<MapTrip> getTripBetweenPointsWithUser(LatLng userPos, List<LatLng> points) async {
+    var fullPath = List<LatLng>.from(points);
+    // Inverted addition order to avoid reallocation
+    fullPath.insert(0, userPos);
+
+    return getTripBetweenPoints(fullPath, skipReturn: true);
   }
 }

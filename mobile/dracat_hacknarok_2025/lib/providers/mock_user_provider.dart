@@ -166,10 +166,6 @@ class MockUserProvider extends ChangeNotifier {
     }
   }
 
-  LatLng? getUserLocation() {
-    return currentUserLocation;
-  }
-
   void setName(String name) {
     _userState?.name = name;
     saveState(_userState);

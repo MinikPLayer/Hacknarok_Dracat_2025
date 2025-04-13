@@ -1,4 +1,3 @@
-import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
@@ -20,7 +19,7 @@ class SwipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<MockUserProvider>(context, listen: true);
-    var userLocation = userProvider.getUserLocation();
+    var userLocation = userProvider.currentUserLocation;
 
     var distance = 0.0;
     if (userLocation != null) {

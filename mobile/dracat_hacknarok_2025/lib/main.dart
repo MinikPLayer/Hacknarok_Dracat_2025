@@ -1,11 +1,10 @@
 import 'package:dracat_hacknarok_2025/dialogs/location_mode_dialog.dart';
-import 'package:dracat_hacknarok_2025/pages/map_page.dart';
+import 'package:dracat_hacknarok_2025/pages/current_trip_map_page.dart';
 import 'package:dracat_hacknarok_2025/pages/location_swiper_page.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -70,6 +69,7 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var tripProvider = Provider.of<MockTripProvider>(context, listen: true);
     var userProvider = Provider.of<MockUserProvider>(context, listen: true);
     if (userProvider.getAllowLocationStatus() == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -98,7 +98,7 @@ class MyHomePage extends StatelessWidget {
     }
 
     return Scaffold(
-      body: Center(child: LocationSwiperPage()),
+      body: Center(child: tripProvider.isTripActive() ? MapPage() : LocationSwiperPage()),
     );
   }
 }

@@ -2,12 +2,10 @@ import 'package:confetti/confetti.dart';
 import 'package:dracat_hacknarok_2025/components/location_card.dart';
 import 'package:dracat_hacknarok_2025/model/location_model.dart';
 import 'package:dracat_hacknarok_2025/model/trip_model.dart';
-import 'package:dracat_hacknarok_2025/pages/map_page.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_location_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -154,12 +152,6 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
                                         name: tripNamecontroller.text,
                                       );
                                       Provider.of<MockTripProvider>(context, listen: false).setActiveTrip(tripData);
-                                      Navigator.of(context).popUntil((route) => route.isFirst);
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => MapPage(),
-                                        ),
-                                      );
                                     },
                               child: Row(
                                 children: [
