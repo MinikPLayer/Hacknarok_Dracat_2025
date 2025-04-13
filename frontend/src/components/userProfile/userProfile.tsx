@@ -11,11 +11,17 @@ import {FaPencil} from "react-icons/fa6";
 
 interface UserData {
   id?: string;
-  name?: string;
+  username?: string;
+  email?: string;
+  telephone?: string;
+  address?: string;
   rank?: string;
   title?: string;
   bio?: string;
   profile_picture?: string;
+  friends?: string[];
+  name?: string;
+  surname?: string;
 }
 
 interface VisitData {
@@ -29,8 +35,8 @@ interface GenreData {
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-// @ts-ignore
-async function getCroppedImg(imageSrc, croppedAreaPixels) {
+
+async function getCroppedImg(imageSrc: string, croppedAreaPixels: { x: number; y: number; width: number; height: number }) {
     return new Promise((resolve, reject) => {
         const image = new Image();
         image.src = imageSrc;
@@ -40,11 +46,14 @@ async function getCroppedImg(imageSrc, croppedAreaPixels) {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
 
+            if (!ctx) {
+                return reject(new Error("Nie można uzyskać kontekstu canvas"));
+            }
+
             canvas.width = croppedAreaPixels.width;
             canvas.height = croppedAreaPixels.height;
 
-            // @ts-ignore
-          ctx.drawImage(
+            ctx.drawImage(
                 image,
                 croppedAreaPixels.x, croppedAreaPixels.y,
                 croppedAreaPixels.width, croppedAreaPixels.height,
@@ -63,36 +72,34 @@ async function getCroppedImg(imageSrc, croppedAreaPixels) {
         image.onerror = (error) => reject(error);
     });
 }
+
 const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
-  const [userData, setUserData] = useState<UserData | null>(null);
   const [profileImage, setProfileImage] = useState<string>('/images/basic/user_no_picture.png');
   const [friends, setFriends] = useState<string[]>(['Jan Kowalski', 'Anna Nowak', 'Piotr Zieliński']);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [qrCodeValue, setQrCodeValue] = useState('');
-  const [user, setUser] = useState({});
-  const [isEditing, setIsEditing] = useState(false);
   const [hover, setHover] = useState(false);
-  const [imageSrc, setImageSrc] = useState(null);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [crop, setCrop] = useState({x: 0, y: 0});
+  const token = localStorage.getItem("access")
   const [zoom, setZoom] = useState(1);
-  const [croppedImage, setCroppedImage] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
-  // Dodaj te nowe funkcje
-  // @ts-ignore
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  const onCropComplete = useCallback(
+    (_: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
 
-  // @ts-ignore
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        // @ts-ignore
-        setImageSrc(reader.result);
+        setImageSrc(reader.result as string);
         setShowCropModal(true);
       };
       reader.readAsDataURL(file);
@@ -105,8 +112,7 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
     try {
       const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
       const formData = new FormData();
-      // @ts-ignore
-      formData.append("profile_picture", croppedBlob);
+      formData.append("profile_picture", croppedBlob as Blob);
 
       const response = await client.post(`${API_BASE_URL}user/`, formData, {
         headers: {
@@ -151,6 +157,13 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  
+  useEffect(() => {
+    if (userData?.friends && userData.friends.length > 0) {
+      setFriends(userData.friends);
+    }
+}, [userData]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -178,6 +191,27 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
 
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+        try {
+            const response = await client.get(API_BASE_URL + "user/", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setUserData(response.data);
+            console.log("Zalogowano");
+            console.log(response.data);
+        } catch (error) {
+            console.log("Nie udało się zalogować");
+        }
+    };
+
+    if (token) {
+        fetchUserData();
+    }
+}, [token]);
 
   useEffect(() => {
     if (isOwnProfile && userData?.id) {
@@ -231,10 +265,7 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
                       transform: 'translate(-50%, -50%)',
                       cursor: 'pointer',
                     }}
-                    onClick={() =>
-                        // @ts-ignore
-                        document.getElementById('avatarInput').click()
-                  }
+                    onClick={() => document.getElementById('avatarInput')?.click()}
                   >
                     <FaPencil style={{ color: 'white', fontSize: '24px' }} />
                   </div>
@@ -248,6 +279,16 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
                 </>
               )}
             </div>
+
+            <div className="profile-info">
+            <h2 className="name">{userData?.username || 'Użytkownik'}</h2>
+            <p className="rank-title">{userData?.rank || 'Nowy użytkownik'} • {userData?.title || 'Podróżnik'}</p>
+            <p className="email">Email: {userData?.email || 'Brak danych'}</p>
+            <p className="telephone">Telefon: {userData?.telephone || 'Brak danych'}</p>
+            <p className="address">Adres: {userData?.address || 'Brak danych'}</p>
+            <p className="full-name">Imię i nazwisko: {userData?.name || 'Nie podano'} {userData?.surname || ''}</p>
+          </div>
+          </div>
 
           <hr className="divider" />
 
@@ -341,8 +382,10 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
               </ResponsiveContainer>
             </div>
           </div>
+        </div>
+      </div>
 
-          <Dialog
+      <Dialog
         open={showCropModal}
         onClose={() => setShowCropModal(false)}
         PaperProps={{
@@ -402,9 +445,6 @@ const UserProfile = ({ isOwnProfile }: { isOwnProfile: boolean }) => {
           </Button>
         </DialogActions>
       </Dialog>
-        </div>
-      </div>
-    </div>
     </div>
   );
 };

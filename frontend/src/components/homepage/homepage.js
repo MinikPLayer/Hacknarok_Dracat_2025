@@ -1,81 +1,62 @@
-import {useTheme} from "@mui/material/styles";
-import CheckCircle from '@mui/icons-material/CheckCircle';
-import ChatIcon from '@mui/icons-material/Chat';
 import React from 'react';
-import {Box, Button, Container, Paper, Stack, Typography, useMediaQuery} from "@mui/material";
+import './homepage.css';
 
-const features = [
-  {
-    icon: <CheckCircle size={48} color="#1976d2" />,
-    title: "Bezproblemowa rekrutacja",
-    description: "Sprawdź progi punktowe, znajdź idealny kierunek i śledź ważne terminy. Dzięki MiUn rekrutacja staje się prostsza niż kiedykolwiek!"
-  },
-  {
-    icon: <ChatIcon size={48} color="#2e7d32" />,
-    title: "Forum studenckie",
-    description: "Poznaj innych studentów, wymieniaj się doświadczeniami i ogłoszeniami. Organizuj wspólne wyjścia i dziel się poradami."
-  },
-
-];
-
-
-
-const Homepage = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+const HomePage = () => {
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(16deg,rgba(112, 198, 212, 0.4) 0%, rgba(219, 72, 212, 0.37) 100%)',
-        py: 8,
-        px: 2
-      }}
-    >
-      <Container maxWidth="md">
-        <Typography variant={isMobile ? 'h4' : 'h3'} fontWeight="bold" textAlign="center" gutterBottom>
-          MiUn – Twoje studia pod kontrolą
-        </Typography>
+    <div className="homepage-container">
+      {/* Header with Background Image */}
+      <header className="hero-section" style={{ backgroundImage: `url('/media/tlokotel.png')` }}>
+        <h1 className="site-title">The NineWonders</h1>
+        <div className="qr-section">
+          <p>Spróbuj naszej aplikacji mobilnej!</p>
+          <p>Od teraz możesz być z nami w każdym miejscu, w każdym momencie, gdziekolwiek jesteś, w podróży czy w pracy.</p>
+          <div className="qr-container">
+            <img src="/media/qrcode-random.png" alt="Kod QR do pobrania aplikacji" className="qr-image" />
+          </div>
+        </div>
+      </header>
 
-        <Typography variant="h6" color="text.secondary" paragraph textAlign="center">
-          Aplikacja stworzona z myślą o studentach i kandydatów na studia. Organizuj swój plan zajęć, poznawaj ludzi i miej dostęp do najważniejszych informacji w jednym miejscu.
-        </Typography>
+      {/* Main Content */}
+      <main className="content-wrapper">
+        {/* Left Column */}
+        <aside className="left-column">
+          <section className="info-section">
+            <h3>Poznawaj i planuj!</h3>
+            <p>Pozwól nam zaplanować twoją podróż, bądź na bieżąco, zapamiętując etap po etapie. Polecimy ci najlepsze miejsca według tego, czego potrzebujesz.</p>
+          </section>
 
-        <Box display="flex" justifyContent="center" my={4}>
-          <Button variant="contained" size="large" sx={{ px: 4, py: 1.5 }}>
-            Dołącz do MiUn
-          </Button>
-        </Box>
+          <section className="info-section">
+            <h3>Podróżuj z przyjaciółmi!</h3>
+            <p>Wspólne przygody tworzą najlepsze wspomnienia. Organizuj wyjazdy w grupie, dziel się doświadczeniami i odkrywajcie świat razem.</p>
+          </section>
+        </aside>
 
-        <Stack spacing={4}>
-          {features.map((feature, index) => (
-            <Paper
-              key={index}
-              elevation={3}
-              sx={{
-                p: 4,
-                textAlign: 'center',
-                transition: 'transform 0.3s, box-shadow 0.3s',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                  boxShadow: 6
-                }
-              }}
-            >
-              <Box mb={2}>{feature.icon}</Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {feature.title}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                {feature.description}
-              </Typography>
-            </Paper>
-          ))}
-        </Stack>
-      </Container>
-    </Box>
+        {/* Center Column (News) */}
+        <section className="center-column">
+          <h2 className="news-title">Aktualności</h2>
+          <article className="event-card">
+            <div className="card-image">
+              <img src="/media/cat_star.png" alt="Jack Sulley w Pandorze" className="news-image" />
+            </div>
+            <div className="card-content">
+              <span className="card-date">21-24.06.2021</span>
+              <h4>Jack Sulley odwiedził Pandorę w dn. 21-24.06.2021</h4>
+              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."</p>
+            </div>
+          </article>
+        </section>
+
+        {/* Right Column (CTA) */}
+        <aside className="right-column">
+          <div className="cta-join">
+            <h4>Co oferujemy!</h4>
+            <p>Planuj, odkrywaj i dziel się swoimi podróżami.</p>
+            <a href="/rejestracja" className="join-button">Dołącz do nas</a>
+          </div>
+        </aside>
+      </main>
+    </div>
   );
 };
 
-export default Homepage;
+export default HomePage;

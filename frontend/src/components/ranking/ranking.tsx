@@ -42,9 +42,10 @@ const RankingPage = () => {
   const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
 
   // Znajdź aktualnego użytkownika (w rzeczywistej aplikacji dane będą pobierane z kontekstu/API)
-  const currentUser = allUsers.find(user => user.id === 4); // Przykładowe ID
+  // Przykładowe ID
   const token = localStorage.getItem("access")
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState<Partial<UserRanking>>({});
+  const currentUser = allUsers.find(user2 => user.id !== undefined && user2.id === user.id);
 
 
   if (!isUserAuthenticated()) {
