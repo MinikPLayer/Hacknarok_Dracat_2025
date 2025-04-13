@@ -1,39 +1,25 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
-import "./navbar.css"
+import React, { useContext, useEffect, useState } from 'react';
+import { AppBar, Toolbar, Container, IconButton, Badge, Avatar, Menu, MenuItem, Typography, Box, useMediaQuery, useTheme } from '@mui/material';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
-import {AuthContext} from "../../AuthContext";
-import {LogoutRounded} from "@mui/icons-material";
+import { AuthContext } from "../../AuthContext";
+import { LogoutRounded } from "@mui/icons-material";
 import client from "../../client";
-import {API_BASE_URL} from "../../config";
+import { API_BASE_URL } from "../../config";
 import CircleNotificationsRoundedIcon from '@mui/icons-material/CircleNotificationsRounded';
-import {Avatar} from "@mui/material";
-import Badge from '@mui/material/Badge';
+import Link from '@mui/material/Link';
 
 const CustomNavbar = () => {
-    const {isAuthenticated} = useContext(AuthContext);
+    const { isAuthenticated } = useContext(AuthContext);
     const [image, setImage] = useState(null);
     const token = localStorage.getItem("access");
-    const image_set = localStorage.getItem("image_set")
+    const image_set = localStorage.getItem("image_set");
     let flag = false;
-    const [isSmallScreen, setIsSmallScreen] = useState(false);
 
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
-useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 992); 
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize(); 
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-useEffect(() => {
+    useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const response = await client.get(API_BASE_URL + "user/", {
@@ -41,7 +27,7 @@ useEffect(() => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                if (response.data.profile_picture){
+                if (response.data.profile_picture) {
                     setImage(response.data.profile_picture.toString().slice(15));
                     localStorage.setItem(response.data.profile_picture.toString().slice(15));
                 }
@@ -55,7 +41,7 @@ useEffect(() => {
             }
         };
 
-        if (!flag){
+        if (!flag) {
             if (token && !image_set) {
                 fetchUserData();
             }
@@ -64,80 +50,72 @@ useEffect(() => {
             }
             flag = true;
         }
-
-
     }, [image, image_set, token]);
 
     return (
-        <div>
-            {/* Navbar */}
-            <Navbar expand="lg" variant="dark" className="shadow-sm"  style={{ backgroundColor: "#111111" }}>
-                <Container>
-                    <Navbar.Brand className="text-primary fw-bold">
-                        <Nav.Link href="/">
-                            <img style={{display: "inline", marginRight: 10}} width={50} alt ="catIcon" src={"" +
-                                "logo.png"}/>
-                        </Nav.Link>
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls=" basic-navbar-nav"/>
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ms-auto" style={{alignItems: "center"}}>
-                            {!isAuthenticated ?
-                                null
-                                :
-                                <Nav.Link href="/main" className="text-white"><HomeRoundedIcon/></Nav.Link>
-                            }
+        <AppBar position="static" sx={{ backgroundColor: "#111111", boxShadow: 1 }}>
+            <Container maxWidth="xl">
+                <Toolbar disableGutters>
+                    <Link href="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                        <Box
+                            component="img"
+                            sx={{ height: 50, width: 50, mr: 1 }}
+                            alt="Logo"
+                            src="logo.png"
+                        />
+                    </Link>
 
+                    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        {isAuthenticated && (
+                            <IconButton href="/main" sx={{ color: 'white', mx: 1 }}>
+                                <HomeRoundedIcon />
+                            </IconButton>
+                        )}
 
-                            {!isAuthenticated ?
-                                <>
-                                    <Nav.Link href="/about" className="text-white">O nas</Nav.Link>
-                                    <Nav.Link href="/contact" className="text-white">Kontakt</Nav.Link>
-                                </>
-                                :
-                                <>
-                                    {/*<Nav.Link href="/jobs" className="text-white">Prace</Nav.Link>*/}
-                                    {/*<Nav.Link href="/trading" className="text-white">Market</Nav.Link>*/}
-                                    {/*<NavDropdown title="Planowanie">*/}
-                                    {/*    <NavDropdown.Item href="/calendar">Kalendarz</NavDropdown.Item>*/}
-                                    {/*    <NavDropdown.Item href="/localizations">*/}
-                                    {/*      Lokalizacje*/}
-                                    {/*    </NavDropdown.Item>*/}
-                                    {/*</NavDropdown>*/}
+                        {!isAuthenticated ? (
+                            <>
+                                <Link href="/about" sx={{ color: 'white', mx: 1, textDecoration: 'none' }}>
+                                    <Typography variant="body1">O nas</Typography>
+                                </Link>
+                                <Link href="/contact" sx={{ color: 'white', mx: 1, textDecoration: 'none' }}>
+                                    <Typography variant="body1">Kontakt</Typography>
+                                </Link>
+                            </>
+                        ) : (
+                            <IconButton href="/notifications" sx={{ color: 'white', mx: 1 }}>
+                                <Badge badgeContent={4} color="primary">
+                                    <CircleNotificationsRoundedIcon />
+                                </Badge>
+                            </IconButton>
+                        )}
 
-                                    <Nav.Link href="/notifications" className="text-white">
-                                        <Badge badgeContent={4} color="primary">
-                                          <CircleNotificationsRoundedIcon/>
-                                        </Badge>
-                                    </Nav.Link>
-                                </>
-                            }
+                        {isAuthenticated && (
+                            <IconButton href="/userProfile" sx={{ color: 'white', mx: 1 }}>
+                                <Avatar src={image} />
+                            </IconButton>
+                        )}
 
-                            {!isAuthenticated ?
-                                null
-                                :
-                                <Nav.Link href="/userProfile" className="text-white">
-                                    <Avatar src={image}/>
-                                </Nav.Link>
-                            }
-
-                            {!isSmallScreen ? (
-                                // For small screens, show login/logout icon
-                                <Nav.Link href={isAuthenticated ? '/logout' : '/login'} className="text-white">
-                                  {isAuthenticated ? <LogoutRounded /> : <LoginRoundedIcon />}
-                                </Nav.Link>
-                              ) : (
-                                // For larger screens, show full text (Login / Logout)
-                                <Nav.Link href={isAuthenticated ? '/logout' : '/login'} className="text-white">
-                                    {isAuthenticated ? <div><span style={{marginRight: 10}}>Wyloguj</span><LogoutRounded /></div> :
-                                        <div><LoginRoundedIcon /><span style={{marginLeft: 10}}> Zaloguj</span></div>}
-                                </Nav.Link>
-                              )}
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
-        </div>
+                        <IconButton href={isAuthenticated ? '/logout' : '/login'} sx={{ color: 'white', mx: 1 }}>
+                            {isSmallScreen ? (
+                                isAuthenticated ? <LogoutRounded /> : <LoginRoundedIcon />
+                            ) : (
+                                isAuthenticated ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Typography variant="body1" sx={{ mr: 1 }}>Wyloguj</Typography>
+                                        <LogoutRounded />
+                                    </Box>
+                                ) : (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <LoginRoundedIcon />
+                                        <Typography variant="body1" sx={{ ml: 1 }}>Zaloguj</Typography>
+                                    </Box>
+                                )
+                            )}
+                        </IconButton>
+                    </Box>
+                </Toolbar>
+            </Container>
+        </AppBar>
     );
 };
 
