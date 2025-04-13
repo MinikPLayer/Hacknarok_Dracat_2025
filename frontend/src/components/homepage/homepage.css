@@ -292,9 +292,9 @@
     }
   }
 
-  .gradient-text {
+  .gradient-text18 {
     background: var(--gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: bold;
-  }
+}

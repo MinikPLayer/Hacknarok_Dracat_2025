@@ -24,6 +24,7 @@ import client from "../../client";
 import {API_BASE_URL} from "../../config";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 const WorldResult = () => {
   const [samplePhotos] = useState([
@@ -66,7 +67,7 @@ const WorldResult = () => {
   ]);
 
   const [showModal, setShowModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<{ url: string; caption: string } | null>(null);
   const [response, setResponse] = useState('');
   const [currentPhotoSet, setCurrentPhotoSet] = useState(0);
   const token = localStorage.getItem("access");
@@ -76,6 +77,27 @@ const WorldResult = () => {
   for (let i = 0; i < samplePhotos.length; i += 4) {
     photoSets.push(samplePhotos.slice(i, i + 4));
   }
+
+  const shareToSocial = (platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin') => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('Sprawdź moją trasę na kampusie!');
+    let shareUrl = '';
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+        break;
+      case 'instagram':
+        navigator.clipboard.writeText(window.location.href).then(() => alert('Link skopiowany! Wklej go w Instagramie.'));
+        return;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+        break;
+    }
+    window.open(shareUrl, '_blank');
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,13 +119,13 @@ const WorldResult = () => {
     }
   }, []);
 
-  const handleImageClick = (index) => {
+  const handleImageClick = (index: number) => {
     const globalIndex = currentPhotoSet * 4 + index;
     setSelectedImage(samplePhotos[globalIndex]);
     setShowModal(true);
   };
 
-  const handleShare = (platform) => {
+  const handleShare = (platform: string) => {
     alert(`Sharing to ${platform} - functionality in development!`);
   };
 
@@ -237,9 +259,9 @@ const WorldResult = () => {
                 Najciekawsze punkty:
               </Typography>
               <ul className="highlights-list">
-                <li><Typography>Zabytkowa starówka (30 min)</Typography></li>
-                <li><Typography>Muzeum Techniki (45 min)</Typography></li>
-                <li><Typography>Park Królewski (1h 15min)</Typography></li>
+                <li>Zabytkowa starówka (30 min)</li>
+                <li>Muzeum Techniki (45 min)</li>
+                <li>Park Królewski (1h 15min)</li>
               </ul>
             </Box>
 
@@ -313,15 +335,18 @@ const WorldResult = () => {
                 Udostępnij swoją przygodę:
               </Typography>
               <Box>
-                <IconButton onClick={() => handleShare('Facebook')} sx={{ color: '#1877f2' }}>
-                  <Facebook fontSize="medium" />
-                </IconButton>
-                <IconButton onClick={() => handleShare('Twitter')} sx={{ color: '#1da1f2' }}>
-                  <Twitter fontSize="medium" />
-                </IconButton>
-                <IconButton onClick={() => handleShare('LinkedIn')} sx={{ color: '#0a66c2' }}>
-                  <LinkedIn fontSize="medium" />
-                </IconButton>
+                 <IconButton onClick={() => shareToSocial('facebook')} aria-label="Udostępnij na Facebooku">
+                    <FaFacebook color="#1877f2" size={24} />
+                  </IconButton>
+                  <IconButton onClick={() => shareToSocial('twitter')} aria-label="Udostępnij na Twitterze">
+                    <FaTwitter color="#1da1f2" size={24} />
+                  </IconButton>
+                  <IconButton onClick={() => shareToSocial('instagram')} aria-label="Udostępnij na Instagramie">
+                    <FaInstagram color="#e1306c" size={24} />
+                  </IconButton>
+                  <IconButton onClick={() => shareToSocial('linkedin')} aria-label="Udostępnij na LinkedIn">
+                    <FaLinkedin color="#0a66c2" size={24} />
+                  </IconButton>
                 <Button
                   variant="contained"
                   startIcon={<ContentCopy />}

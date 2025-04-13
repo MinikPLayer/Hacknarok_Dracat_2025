@@ -1,315 +1,390 @@
-import React, { useState, useEffect, useRef, FC } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import React, { useState, useEffect, useRef, useCallback, FC } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { LatLngExpression, Map as LeafletMap, DivIcon, Icon } from 'leaflet';
-import { Box, Typography, Button } from "@mui/material";
-import { Feature, LineString, Point } from 'geojson'; // For OSRM response typing
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import iconShadowUrl from 'leaflet/dist/images/marker-shadow.png';
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import L, { LatLngExpression, Map as LeafletMap, Icon } from 'leaflet';
+import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
+import { FaPlus, FaMinus, FaTimes, FaShareAlt, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import './mapWithPins.css';
 
 interface Coordinates {
-    latitude: number;
-    longitude: number;
+  latitude: number;
+  longitude: number;
 }
 
 interface LocationData extends Coordinates {
-    id: number;
-    name: string;
-    description: string;
+  id: number;
+  name: string;
+  description: string;
 }
 
-type MarkerType = 'route' | 'user' | 'default';
-
-type RouteSegment = LatLngExpression[];
-
-interface OSRMRoute {
-    geometry: LineString;
-    legs: any[];
-    distance: number;
-    duration: number;
-}
-
-interface OSRMRouteResponse {
-    code: string;
-    routes: OSRMRoute[];
-    waypoints: any[];
-}
-
-interface OSMGeometry {
-    coordinates: number[][];
-    type: string;
-}
-
-interface OSMStep {
-    distance: number;
-    driving_side: string;
-    duration: number;
-    geometry: OSMGeometry;
-}
-
-interface OSRMLeg {
-    steps: OSMStep[];
-    summary: string;
-    weight: number;
-    duration: number;
-    distance: number;
-}
-
-interface OSRMTrip {
-    geometry: LineString;
-    legs: OSRMLeg[];
-    distance: number;
-    duration: number;
-    weight_name: string;
-    weight: number;
+interface RouteSegment {
+  coordinates: LatLngExpression[];
+  distance: number;
+  duration: number;
 }
 
 interface OSRMTripResponse {
-    code: string;
-    trips: OSRMTrip[];
-    waypoints: any[];
+  code: string;
+  trips: Array<{
+    geometry: { coordinates: number[][] };
+    distance: number;
+    duration: number;
+  }>;
+  waypoints: any[];
 }
 
-const createQuestionIcon = (): DivIcon => new L.DivIcon({
-    html: '<div style="font-size: 24px; color: #1976d2;">❓</div>',
-    className: '',
-    iconSize: [24, 24],
-    iconAnchor: [12, 24],
-    popupAnchor: [0, -24],
-});
-
-const createRouteIcon = (): Icon => new L.Icon({
-    iconUrl: iconUrl,
-    shadowUrl: iconShadowUrl,
+const createRouteIcon = (): Icon =>
+  new L.Icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+    shadowSize: [41, 41],
+  });
 
-const createUserIcon = (): DivIcon => new L.DivIcon({
-    html: '<div style="font-size: 24px; color: #FF5722;">👤</div>',
-    className: '',
-    iconSize: [24, 24],
-    iconAnchor: [12, 24],
-    popupAnchor: [0, -24],
-});
-
-
-interface ChangeMapCenterProps {
-    center: LatLngExpression | null;
-}
-
-
-const ChangeMapCenter: FC<ChangeMapCenterProps> = ({ center }) => {
-    const navigate = useNavigate();
-    const map = useMap();
-    useEffect(() => {
-        if (center) {
-            map.setView(center, map.getZoom());
-        }
-    }, [center, map]);
-    return null;
+const ChangeMapCenter: FC<{ center: LatLngExpression }> = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
 };
 
-const getLocationMarkerIcon = (type: MarkerType): DivIcon | Icon => {
-    switch (type) {
-        case 'route':
-            return createRouteIcon();
-        case 'user':
-            return createUserIcon();
-        default:
-            return createQuestionIcon();
-    }
-}
+const LocationMarker: FC<{
+  location: LocationData | Coordinates & { name?: string };
+  type: 'user' | 'route';
+  onClick?: (location: Coordinates) => void;
+}> = ({ location, type, onClick }) => {
+  const position: LatLngExpression = [location.latitude, location.longitude];
 
-interface LocationMarkerProps {
-    location: Coordinates & { name?: string; description?: string };
-    type: MarkerType;
-    onClick?: (location: Coordinates) => void;
-}
-
-// ... importy i ikony takie jak wcześniej (bez zmian)
-
-const exampleLocations: LocationData[] = [
-    { id: 1, name: "Budynek A", latitude: 50.0645, longitude: 19.9234, description: "A-0" },
-    { id: 2, name: "Budynek B", latitude: 50.066, longitude: 19.922, description: "B-2" },
-    { id: 3, name: "Budynek C", latitude: 50.0632, longitude: 19.927, description: "C-3" },
-];
-
-const userLocation: Coordinates = { latitude: 50.0745, longitude: 19.9234 };
-
-const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) => {
-    const position: LatLngExpression = [location.latitude, location.longitude];
-
-    const handleClick = () => {
-        if (onClick) {
-            onClick(location);
-        }
-    };
-
-    return (
-        <Marker
-            position={position}
-            icon={getLocationMarkerIcon(type)}
-            eventHandlers={{ click: handleClick }}
-        >
-            {(location.name || location.description || type === 'route') && (
-                <Popup>
-                    {location.name && <Typography variant="subtitle1">{location.name}</Typography>}
-                    {location.description && <Typography variant="body2">{location.description}</Typography>}
-                    {type === "route" && (
-                        <>
-                            <Typography variant="caption">Punkt trasy</Typography>
-                            <Button
-                                size="small"
-                                onClick={handleClick}
-                                sx={{ mt: 1 }}
-                                variant="contained"
-                            >
-                                Prowadź tutaj
-                            </Button>
-                        </>
-                    )}
-                </Popup>
-            )}
-        </Marker>
-    );
+  return (
+    <Marker
+      position={position}
+      icon={createRouteIcon()}
+      eventHandlers={{ click: () => onClick?.(location) }}
+      keyboard={true}
+      aria-label={type === 'user' ? 'Twoja lokalizacja' : location.name || 'Punkt na mapie'}
+    >
+      <Popup>
+        <Typography variant="subtitle1">{location.name || (type === 'user' ? 'Twoja lokalizacja' : 'Punkt')}</Typography>
+        {'description' in location && location.description && (
+          <Typography variant="body2">{location.description}</Typography>
+        )}
+        {type === 'route' && (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => onClick?.(location)}
+            sx={{ mt: 1 }}
+            aria-label={`Nawiguj do ${location.name || 'punktu'}`}
+          >
+            Nawiguj
+          </Button>
+        )}
+      </Popup>
+    </Marker>
+  );
 };
 
 const MapWithRouting: FC = () => {
-    const [addRouteAllBlocked, setAddRouteAllBlocked] = useState(false);
-    const [locations] = useState<LocationData[]>(exampleLocations);
-    const [mapCenter] = useState<LatLngExpression | null>(null);
-    const [fullRoutes, setFullRoutes] = useState<RouteSegment[] | null>(null);
-    const mapRef = useRef<LeafletMap | null>(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const mapRef = useRef<LeafletMap | null>(null);
+  const [locations] = useState<LocationData[]>([
+    { id: 1, name: 'Budynek A', latitude: 50.0645, longitude: 19.9234, description: 'A-0' },
+    { id: 2, name: 'Budynek B', latitude: 50.066, longitude: 19.922, description: 'B-2' },
+    { id: 3, name: 'Budynek C', latitude: 50.0632, longitude: 19.927, description: 'C-3' },
+  ]);
+  const [userLocation, setUserLocation] = useState<Coordinates>({ latitude: 50.0745, longitude: 19.9234 });
+  const [routes, setRoutes] = useState<RouteSegment[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
-    const clearAllRoutes = (): void => {
-        setFullRoutes(null);
-    };
-
-    const fetchRouteSequenceData = async (points: Coordinates[]): Promise<void> => {
-        if (points.length < 2) return;
-
-        const coordinatesString = points.map(p => `${p.longitude},${p.latitude}`).join(';');
-        const url = `https://router.project-osrm.org/route/v1/driving/${coordinatesString}?overview=full&geometries=geojson`;
-
-        try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            const data: OSRMRouteResponse = await res.json();
-
-            if (data.routes && data.routes.length > 0) {
-                const coords = data.routes[0].geometry.coordinates.map(
-                    ([lng, lat]): LatLngExpression => [lat, lng]
-                );
-                setFullRoutes([coords]);
-
-                if (mapRef.current) {
-                    const bounds = L.latLngBounds(coords);
-                    mapRef.current.fitBounds(bounds);
-                }
-            } else {
-                setFullRoutes(null);
-            }
-        } catch (err) {
-            console.error("Route error:", err);
-            setFullRoutes(null);
+  // Get user location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        () => {
+          console.warn('Geolocation unavailable, using default location');
         }
-    };
+      );
+    }
+  }, []);
 
-    const handleLocationClick = async (location: Coordinates) => {
-        await fetchRouteSequenceData([userLocation, location]);
-    };
+  // Debounced route fetch
+  const fetchRoute = useCallback(
+    async (points: Coordinates[]): Promise<RouteSegment | null> => {
+      if (points.length < 2) {
+        setError('Wybierz co najmniej dwa punkty.');
+        return null;
+      }
 
-    const addRouteAllHandler = async () => {
-        setAddRouteAllBlocked(true);
-        await fetchRouteSequenceData([userLocation, ...locations]);
-        setTimeout(() => setAddRouteAllBlocked(false), 1000);
-    };
+      // Avoid duplicate coordinates
+      const uniquePoints = points.filter(
+        (p, i, arr) =>
+          i === 0 ||
+          arr.findIndex((q) => q.latitude === p.latitude && q.longitude === p.longitude) === i
+      );
+      if (uniquePoints.length < 2) {
+        setError('Punkty są zbyt blisko siebie.');
+        return null;
+      }
 
-    const indexToColor = (index: number): string => {
-        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'];
-        const alpha = index === 0 ? 1.0 : index === 1 ? 0.6 : 0.4;
-        const alphaHex = Math.floor(alpha * 255).toString(16).padStart(2, '0');
-        return `${colors[index % colors.length]}${alphaHex}`;
-    };
+      setIsLoading(true);
+      setError('');
+      try {
+        const coordinatesString = uniquePoints.map((p) => `${p.longitude},${p.latitude}`).join(';');
+        const url = `https://router.project-osrm.org/trip/v1/driving/${coordinatesString}?overview=full&geometries=geojson&source=first&destination=last`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Błąd HTTP ${res.status}`);
+        const data: OSRMTripResponse = await res.json();
 
-    return (
-        <Box sx={{ padding: { xs: 1, sm: 2, md: 4 } }}>
-            <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-                <Typography variant="h6">Campus Map & Routing</Typography>
-                {fullRoutes && (
-                    <Button variant="outlined" color="secondary" size="small" onClick={clearAllRoutes}>
-                        Clear All Routes
-                    </Button>
-                )}
-                <Button
-                    disabled={addRouteAllBlocked}
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={addRouteAllHandler}
-                >
-                    {addRouteAllBlocked ? "Calculating..." : "Route To All Buildings"}
-                </Button>
-            </Box>
+        if (data.trips?.length) {
+          const coords = data.trips[0].geometry.coordinates.map(([lng, lat]): LatLngExpression => [lat, lng]);
+          return {
+            coordinates: coords,
+            distance: data.trips[0].distance / 1000, // Convert to km
+            duration: data.trips[0].duration / 60, // Convert to minutes
+          };
+        }
+        throw new Error('Brak trasy');
+      } catch (err) {
+        setError('Nie udało się wyznaczyć trasy. Spróbuj ponownie.');
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
-            <MapContainer
-                center={[50.0645, 19.9234]}
-                zoom={15}
-                scrollWheelZoom={true}
-                style={{
-                    height: '75vh',
-                    width: '100%',
-                    borderRadius: '8px',
-                    border: '1px solid #ccc'
-                }}
-                ref={mapRef}
+  const handleLocationClick = useCallback(
+    async (location: Coordinates) => {
+      const route = await fetchRoute([userLocation, location]);
+      if (route) setRoutes([route]);
+    },
+    [fetchRoute, userLocation]
+  );
+
+  const handleRouteAll = useCallback(async () => {
+    const route = await fetchRoute([userLocation, ...locations]);
+    if (route) setRoutes([route]);
+  }, [fetchRoute, userLocation, locations]);
+
+  const clearRoutes = () => {
+    setRoutes(null);
+    setError('');
+  };
+
+  const zoomIn = () => mapRef.current?.zoomIn();
+  const zoomOut = () => mapRef.current?.zoomOut();
+
+  const shareRoute = () => {
+    setShareDialogOpen(true);
+  };
+
+  const shareToSocial = (platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin') => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('Sprawdź moją trasę na kampusie!');
+    let shareUrl = '';
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+        break;
+      case 'instagram':
+        navigator.clipboard.writeText(window.location.href).then(() => alert('Link skopiowany! Wklej go w Instagramie.'));
+        return;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+        break;
+    }
+    window.open(shareUrl, '_blank');
+  };
+
+  return (
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: 'var(--background-color)' }} role="region" aria-label="Mapa kampusu">
+      <motion.div
+        className="map-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="map-header">
+          <div>
+            <Typography className="map-title">Mapa Kampusu</Typography>
+            <Typography className="map-subtitle">Znajdź budynki i wyznacz trasę</Typography>
+          </div>
+          <div className="map-controls">
+            <Button
+              className="map-button"
+              variant="contained"
+              onClick={handleRouteAll}
+              disabled={isLoading}
+              startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}
+              aria-label="Wyznacz trasę do wszystkich budynków"
             >
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-
-                <LocationMarker
-                    location={{ ...userLocation, name: "Your Location" }}
-                    type="user"
-                    onClick={() => {}}
-                />
-
-                {locations.map(loc => (
-                    <LocationMarker
-                        key={loc.id}
-                        location={loc}
-                        type="route"
-                        onClick={handleLocationClick}
-                    />
-                ))}
-
-                {fullRoutes?.map((segment, i) =>
-                    segment.length > 0 && (
-                        <Polyline
-                            key={`route-${i}`}
-                            positions={segment}
-                            pathOptions={{
-                                color: indexToColor(i),
-                                weight: 5
-                            }}
-                        />
-                    )
-                )}
-
-                {mapCenter && <ChangeMapCenter center={mapCenter} />}
-            </MapContainer>
-
-            <Button variant="contained" onClick={() => navigate("/worlds")}>
-                Zakończ trasę
+              {isLoading ? 'Obliczanie...' : 'Trasa do wszystkich'}
             </Button>
-        </Box>
-    );
+            {routes && (
+              <Button
+                className="map-button"
+                variant="outlined"
+                onClick={clearRoutes}
+                aria-label="Wyczyść trasę"
+              >
+                Wyczyść trasę
+              </Button>
+            )}
+            <Button
+              className="map-button"
+              variant="contained"
+              onClick={shareRoute}
+              startIcon={<FaShareAlt />}
+              aria-label="Udostępnij trasę"
+            >
+              Udostępnij
+            </Button>
+            <Button
+              className="map-button"
+              variant="contained"
+              onClick={() => navigate('/worlds')}
+              aria-label="Zakończ trasę i wróć"
+            >
+              Zakończ
+            </Button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              className="error-message"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaTimes /> {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <MapContainer
+          center={[userLocation.latitude, userLocation.longitude]}
+          zoom={15}
+          scrollWheelZoom={true}
+          style={{ height: '100%', width: '100%' }}
+          ref={mapRef}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          />
+          <LocationMarker location={{ ...userLocation, name: 'Twoja lokalizacja' }} type="user" />
+          {locations.map((loc) => (
+            <LocationMarker key={loc.id} location={loc} type="route" onClick={handleLocationClick} />
+          ))}
+          {routes?.map((route, i) => (
+            <Polyline
+              key={`route-${i}`}
+              positions={route.coordinates}
+              pathOptions={{ color: i === 0 ? '#1e90ff' : '#60a5fa', weight: 5 }}
+            />
+          ))}
+          {routes?.[0] && (
+            <ChangeMapCenter
+              center={routes[0].coordinates[Math.floor(routes[0].coordinates.length / 2)]}
+            />
+          )}
+        </MapContainer>
+
+        <div className="zoom-controls">
+          <IconButton className="zoom-button" onClick={zoomIn} aria-label="Powiększ mapę">
+            <FaPlus />
+          </IconButton>
+          <IconButton className="zoom-button" onClick={zoomOut} aria-label="Pomniejsz mapę">
+            <FaMinus />
+          </IconButton>
+        </div>
+
+        {routes?.[0] && (
+          <motion.div
+            className="route-info"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Typography variant="subtitle1">Szczegóły trasy</Typography>
+            <Typography variant="body2">
+              Dystans: {routes[0].distance.toFixed(2)} km
+            </Typography>
+            <Typography variant="body2">
+              Czas: {Math.round(routes[0].duration)} minut
+            </Typography>
+          </motion.div>
+        )}
+      </motion.div>
+
+      <AnimatePresence>
+        {shareDialogOpen && (
+          <motion.div
+            className="share-dialog"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="share-dialog-content"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Udostępnij trasę
+              </Typography>
+              <div className="share-buttons">
+                <IconButton onClick={() => shareToSocial('facebook')} aria-label="Udostępnij na Facebooku">
+                  <FaFacebook color="#1877f2" size={24} />
+                </IconButton>
+                <IconButton onClick={() => shareToSocial('twitter')} aria-label="Udostępnij na Twitterze">
+                  <FaTwitter color="#1da1f2" size={24} />
+                </IconButton>
+                <IconButton onClick={() => shareToSocial('instagram')} aria-label="Udostępnij na Instagramie">
+                  <FaInstagram color="#e1306c" size={24} />
+                </IconButton>
+                <IconButton onClick={() => shareToSocial('linkedin')} aria-label="Udostępnij na LinkedIn">
+                  <FaLinkedin color="#0a66c2" size={24} />
+                </IconButton>
+              </div>
+              <Button
+                className="map-button"
+                variant="contained"
+                onClick={() => setShareDialogOpen(false)}
+                fullWidth
+                aria-label="Zamknij okno udostępniania"
+              >
+                Zamknij
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Box>
+  );
 };
 
 export default MapWithRouting;

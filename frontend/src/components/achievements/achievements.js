@@ -110,10 +110,15 @@ const AchievementsPage = () => {
       {/* Nagłówek */}
       <header className="achievements-header">
         <button className="back-button" onClick={() => navigate(-1)}>
-          <FaArrowLeft /> Wróć
+            <FaArrowLeft /> Wróć
         </button>
-        <h1><FaTrophy /> Moje Osiągnięcia</h1>
-      </header>
+        <div className="header-title-container">
+            <h1>
+            <FaTrophy /> Moje Osiągnięcia
+            <img src={'media/kotelIcon.png'} alt="Kotel" className="kotel-icon" />
+            </h1>
+        </div>
+        </header>
 
       {/* Statystyki */}
       <div className="achievements-stats">
