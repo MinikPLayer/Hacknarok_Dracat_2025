@@ -246,6 +246,29 @@ const TinderCard = ({ card, onSwipe, setLastSwipe, navbarHeight, isTopCard, setE
                   mb: 3,
                 }}
               />
+              
+              {/* Dodane wyświetlanie GIF-a */}
+              {card.details.gif && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ color: '#2d3748', mb: 1, fontWeight: 600 }}
+                  >
+                    Animacja
+                  </Typography>
+                  <CardMedia
+                    component="img"
+                    src={card.details.gif}
+                    alt={`${card.name} animation`}
+                    sx={{
+                      width: '100%',
+                      borderRadius: '8px',
+                      border: 'none',
+                    }}
+                  />
+                </Box>
+              )}
+
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <FaMapMarkerAlt style={{ color: '#1e90ff', marginRight: '8px' }} />
                 <Typography variant="body2" color="#4b5563">
@@ -419,7 +442,7 @@ const ImageSwiper = () => {
           'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
           'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
         ],
-        video: 'https://youtu.be/zFidNgzElbU?si=ReNVm-a0YQPsnfVi',
+        gif: '/media/kotbujak.gif',
         reviews: [
           {
             author: 'Anna K.',
@@ -448,7 +471,7 @@ const ImageSwiper = () => {
           'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
           'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
         ],
-        video: 'https://www.youtube.com/embed/Xr2pH7sIzEg',
+        gif: '/media/kotbujak.gif',
         reviews: [
           {
             author: 'Kasia L.',
@@ -477,7 +500,7 @@ const ImageSwiper = () => {
           'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
           'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
         ],
-        video: 'https://www.youtube.com/embed/Uv7W1VTSM0s',
+        gif: '/media/kotbujak.gif',
         reviews: [
           {
             author: 'Marta Z.',
