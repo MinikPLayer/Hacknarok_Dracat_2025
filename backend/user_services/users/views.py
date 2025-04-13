@@ -12,8 +12,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import AppUser
-from users.serializers import UserRegisterSerializer, UserSerializer
+from users.models import AppUser, Notification
+from users.serializers import UserRegisterSerializer, UserSerializer, NotificationSerializer
 from rest_framework.views import APIView
 
 
@@ -158,3 +158,55 @@ class LlamaGenerateView(APIView):
             return Response({"response": data.get("response", "").strip()})
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class NotificationsData(APIView):
+    permission_classes = (permissions.IsAuthenticated,)  # Only authenticated users can log out
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user)
+        serializer = NotificationSerializer(notifications, many=True)
+        num = len(notifications.filter(isRead=False))
+        return Response({"notifications": serializer.data, "num": num}, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk=None):
+        try:
+            notification = Notification.objects.get(pk=pk, user=request.user)
+        except Notification.DoesNotExist:
+            return Response(
+                {"error": "Notification not found or you don't have permission"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Only allow updating the 'is_read' field
+        if 'is_read' not in request.data:
+            return Response(
+                {"error": "Only 'isRead' field can be updated"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = NotificationSerializer(
+            notification,
+            data={'isRead': request.data['isRead']},
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        try:
+            notification = Notification.objects.get(pk=pk, user=request.user)
+        except Notification.DoesNotExist:
+            return Response(
+                {"error": "Notification not found or you don't have permission"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        notification.delete()
+        return Response(
+            {"message": "Notification deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT
+        )

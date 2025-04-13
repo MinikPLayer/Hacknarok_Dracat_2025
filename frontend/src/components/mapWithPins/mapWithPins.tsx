@@ -96,17 +96,11 @@ const createUserIcon = (): DivIcon => new L.DivIcon({
     popupAnchor: [0, -24],
 });
 
-const exampleLocations: LocationData[] = [
-    { id: 1, name: "Budynek A", latitude: 50.0645, longitude: 19.9234, description: "A-0" },
-    { id: 2, name: "Budynek B", latitude: 50.066, longitude: 19.922, description: "B-2" },
-    { id: 3, name: "Budynek C", latitude: 50.0632, longitude: 19.927, description: "C-3" },
-];
-
-const userLocation: Coordinates = { latitude: 50.0745, longitude: 19.9234 };
 
 interface ChangeMapCenterProps {
     center: LatLngExpression | null;
 }
+
 
 const ChangeMapCenter: FC<ChangeMapCenterProps> = ({ center }) => {
     const navigate = useNavigate();
@@ -136,6 +130,16 @@ interface LocationMarkerProps {
     onClick?: (location: Coordinates) => void;
 }
 
+// ... importy i ikony takie jak wcześniej (bez zmian)
+
+const exampleLocations: LocationData[] = [
+    { id: 1, name: "Budynek A", latitude: 50.0645, longitude: 19.9234, description: "A-0" },
+    { id: 2, name: "Budynek B", latitude: 50.066, longitude: 19.922, description: "B-2" },
+    { id: 3, name: "Budynek C", latitude: 50.0632, longitude: 19.927, description: "C-3" },
+];
+
+const userLocation: Coordinates = { latitude: 50.0745, longitude: 19.9234 };
+
 const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) => {
     const position: LatLngExpression = [location.latitude, location.longitude];
 
@@ -151,16 +155,16 @@ const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) =>
             icon={getLocationMarkerIcon(type)}
             eventHandlers={{ click: handleClick }}
         >
-            {(location.name || location.description) && (
+            {(location.name || location.description || type === 'route') && (
                 <Popup>
                     {location.name && <Typography variant="subtitle1">{location.name}</Typography>}
                     {location.description && <Typography variant="body2">{location.description}</Typography>}
                     {type === "route" && (
                         <>
-                            <Typography variant="caption">Route endpoint</Typography>
+                            <Typography variant="caption">Punkt trasy</Typography>
                             <Button
                                 size="small"
-                                onClick={() => onClick?.(location)}
+                                onClick={handleClick}
                                 sx={{ mt: 1 }}
                                 variant="contained"
                             >
@@ -175,103 +179,70 @@ const LocationMarker: FC<LocationMarkerProps> = ({ location, type, onClick }) =>
 };
 
 const MapWithRouting: FC = () => {
-    const [addRouteAllBlocked, setAddRouteAllBlocked] = useState<boolean>(false);
+    const [addRouteAllBlocked, setAddRouteAllBlocked] = useState(false);
     const [locations] = useState<LocationData[]>(exampleLocations);
     const [mapCenter] = useState<LatLngExpression | null>(null);
     const [fullRoutes, setFullRoutes] = useState<RouteSegment[] | null>(null);
     const mapRef = useRef<LeafletMap | null>(null);
     const navigate = useNavigate();
 
-    const handleLocationClick = async (location: Coordinates): Promise<void> => {
-        console.log("Generating route to:", location);
-        const singleLocation = [location];
-        await fetchTripData(singleLocation);
-    };
-
     const clearAllRoutes = (): void => {
         setFullRoutes(null);
-    }
+    };
 
-    const fetchTripData = async (points: Coordinates[]): Promise<void> => {
-        if (points.length === 0) {
-            setFullRoutes(null);
-            return;
-        }
+    const fetchRouteSequenceData = async (points: Coordinates[]): Promise<void> => {
+        if (points.length < 2) return;
 
-        const allPoints = [userLocation, ...points];
-        const coordinatesString = allPoints
-            .map(point => `${point.longitude},${point.latitude}`)
-            .join(';');
-
-        const url = `https://router.project-osrm.org/trip/v1/driving/${coordinatesString}?overview=full&geometries=geojson&steps=true&annotations=true&source=first&destination=last`;
+        const coordinatesString = points.map(p => `${p.longitude},${p.latitude}`).join(';');
+        const url = `https://router.project-osrm.org/route/v1/driving/${coordinatesString}?overview=full&geometries=geojson`;
 
         try {
-            const tripResponse = await fetch(url);
-            if (!tripResponse.ok) throw new Error(`HTTP error! status: ${tripResponse.status}`);
-            const tripData: OSRMTripResponse = await tripResponse.json();
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+            const data: OSRMRouteResponse = await res.json();
 
-            if (tripData.trips && tripData.trips.length > 0) {
-                const routes: RouteSegment[] = [];
-                tripData.trips[0].legs.forEach(leg => {
-                    var newRoute = leg.steps.map((step: OSMStep) => {
-                        return step.geometry.coordinates.map(
-                            (coord): LatLngExpression => [coord[1], coord[0]]
-                        );
-                    });
-                    const flatRoute = newRoute.flat();
-                    routes.push(flatRoute);
-                });
+            if (data.routes && data.routes.length > 0) {
+                const coords = data.routes[0].geometry.coordinates.map(
+                    ([lng, lat]): LatLngExpression => [lat, lng]
+                );
+                setFullRoutes([coords]);
 
-                setFullRoutes(routes.slice(0, points.length));
-
-                if (mapRef.current && routes.length > 0) {
-                    const allCoords = routes.flat();
-                    if (allCoords.length > 0) {
-                        const bounds = L.latLngBounds(allCoords);
-                        mapRef.current.fitBounds(bounds);
-                    }
+                if (mapRef.current) {
+                    const bounds = L.latLngBounds(coords);
+                    mapRef.current.fitBounds(bounds);
                 }
-
             } else {
                 setFullRoutes(null);
             }
-        } catch (error) {
-            console.error("Error fetching trip data:", error);
+        } catch (err) {
+            console.error("Route error:", err);
             setFullRoutes(null);
         }
     };
 
-    const addRouteAllHandler = (): void => {
+    const handleLocationClick = async (location: Coordinates) => {
+        await fetchRouteSequenceData([userLocation, location]);
+    };
+
+    const addRouteAllHandler = async () => {
         setAddRouteAllBlocked(true);
-        fetchTripData(locations)
-            .finally(() => {
-                setTimeout(() => {
-                    setAddRouteAllBlocked(false);
-                }, 1000);
-            });
+        await fetchRouteSequenceData([userLocation, ...locations]);
+        setTimeout(() => setAddRouteAllBlocked(false), 1000);
     };
 
     const indexToColor = (index: number): string => {
-        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080'];
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'];
         const alpha = index === 0 ? 1.0 : index === 1 ? 0.6 : 0.4;
         const alphaHex = Math.floor(alpha * 255).toString(16).padStart(2, '0');
-        const color = colors[index % colors.length];
-        return `${color}${alphaHex}`;
+        return `${colors[index % colors.length]}${alphaHex}`;
     };
 
     return (
         <Box sx={{ padding: { xs: 1, sm: 2, md: 4 } }}>
             <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-                <Typography variant="h6" component="h2">
-                    Campus Map & Routing
-                </Typography>
+                <Typography variant="h6">Campus Map & Routing</Typography>
                 {fullRoutes && (
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        size="small"
-                        onClick={clearAllRoutes}
-                    >
+                    <Button variant="outlined" color="secondary" size="small" onClick={clearAllRoutes}>
                         Clear All Routes
                     </Button>
                 )}
@@ -306,10 +277,10 @@ const MapWithRouting: FC = () => {
                 <LocationMarker
                     location={{ ...userLocation, name: "Your Location" }}
                     type="user"
-                    onClick={() => console.log("User marker clicked")}
+                    onClick={() => {}}
                 />
 
-                {locations.map((loc) => (
+                {locations.map(loc => (
                     <LocationMarker
                         key={loc.id}
                         location={loc}
@@ -318,26 +289,23 @@ const MapWithRouting: FC = () => {
                     />
                 ))}
 
-                {fullRoutes?.map((routeSegment, index) => (
-                    routeSegment && routeSegment.length > 0 && (
+                {fullRoutes?.map((segment, i) =>
+                    segment.length > 0 && (
                         <Polyline
-                            key={`route-${index}`}
-                            positions={routeSegment}
+                            key={`route-${i}`}
+                            positions={segment}
                             pathOptions={{
-                                color: indexToColor(index),
-                                weight: 5,
+                                color: indexToColor(i),
+                                weight: 5
                             }}
                         />
                     )
-                ))}
+                )}
 
                 {mapCenter && <ChangeMapCenter center={mapCenter} />}
             </MapContainer>
 
-            <Button
-                variant="contained"
-                onClick={() => navigate("/worlds")}
-            >
+            <Button variant="contained" onClick={() => navigate("/worlds")}>
                 Zakończ trasę
             </Button>
         </Box>

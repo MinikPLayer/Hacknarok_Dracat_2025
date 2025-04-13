@@ -2,7 +2,8 @@ from . import views
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import LlamaGenerateView
+from .models import Notification
+from .views import LlamaGenerateView, NotificationsData
 
 urlpatterns = [
     path('register/', views.UserRegister.as_view(), name='register'),
@@ -12,5 +13,7 @@ urlpatterns = [
 
     path('user/', views.OneUserData.as_view(), name='user'),
     path('generate/', LlamaGenerateView.as_view(), name='llama-generate'),
+    path('notifications/', NotificationsData.as_view(), name='notifications'),
+    path('notifications/<int:pk>/', NotificationsData.as_view(), name='notification-detail'),
 
 ]

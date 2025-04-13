@@ -3,7 +3,7 @@ import {isUserAuthenticated} from "../../AuthContext";
 import {Navigate, useNavigate} from 'react-router-dom';
 import './formModule.css';
 import {FaMoneyBillWave, FaMapMarkerAlt, FaSearch, FaLocationArrow} from 'react-icons/fa';
-import {ToggleButton, ToggleButtonGroup, Typography, CircularProgress, Box, Button, Slider} from '@mui/material';
+import {ToggleButton, ToggleButtonGroup, Typography, CircularProgress, Box, Button, Slider, Snackbar, Alert} from '@mui/material';
 
 type TripMode = 'plan' | 'adventure';
 type BudgetRange = 0;
@@ -137,12 +137,14 @@ const TripForm = () => {
         });
     };
 
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!formData.destination) {
-            alert("Please select a destination or use your current location");
-            return;
+          setOpenSnackbar(true);
+          return;
         }
 
         const tripData = {
@@ -151,16 +153,34 @@ const TripForm = () => {
         };
 
         console.log('Trip data submitted:', tripData);
-        navigate('/swiper', {state: {tripData}});
+        if (tripMode === "plan"){
+            navigate('/swiper', {state: {tripData}});
+        }else{
+            navigate('/map', {state: {tripData}});
+        }
+
     };
 
     if (!isUserAuthenticated()) {
         return <Navigate to="/login"/>;
     }
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+      };
+
+
     return (
         <Box className="trip-form-container" sx={{maxWidth: 600, mx: 'auto', p: 3}}>
-
+             <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+              >
+                <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+                  Proszę wybrać swój obszar początkowy lub obecną lokację
+                </Alert>
+              </Snackbar>
             <img height={300} src={"media/cat_seeker.png"}/>
             <header className="form-header" style={{textAlign: 'center', marginBottom: '2rem'}}>
                 <Typography variant="h4" component="h1" gutterBottom>

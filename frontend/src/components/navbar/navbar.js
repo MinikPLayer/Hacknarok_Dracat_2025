@@ -18,6 +18,7 @@ const CustomNavbar = () => {
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+    const [num, setNum] = useState(0);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -36,6 +37,18 @@ const CustomNavbar = () => {
                     localStorage.setItem("/images/basic/user_no_picture.png");
                 }
 
+            } catch (error) {
+                console.log("Nie udało się zalogować");
+            }
+             try {
+                const response = await client.get(API_BASE_URL + "notifications/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setNum(response.data.num);
+                console.log("Zalogowano");
+                console.log(response.data);
             } catch (error) {
                 console.log("Nie udało się zalogować");
             }
@@ -83,7 +96,7 @@ const CustomNavbar = () => {
                             </>
                         ) : (
                             <IconButton href="/notifications" sx={{ color: 'white', mx: 1 }}>
-                                <Badge badgeContent={2} color="primary">
+                                <Badge badgeContent={num} color="primary">
                                     <CircleNotificationsRoundedIcon />
                                 </Badge>
                             </IconButton>
