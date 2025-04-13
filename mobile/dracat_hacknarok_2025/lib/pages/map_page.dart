@@ -13,8 +13,15 @@ class MapPage extends StatefulWidget {
   State<MapPage> createState() => _MapComponentState();
 }
 
+class MapWaypoint {
+  OSRMWaypoint waypoint;
+  bool isOpened = false;
+
+  MapWaypoint(this.waypoint, {this.isOpened = false});
+}
+
 class _MapComponentState extends State<MapPage> {
-  List<LatLng> landmarksPositions = [];
+  List<MapWaypoint> landmarks = [];
 
   LatLng initialCenter = LatLng(50.0645, 19.9234);
   LatLng userPosition = LatLng(50.0745, 19.9234);
@@ -43,23 +50,73 @@ class _MapComponentState extends State<MapPage> {
     }
   }
 
+  // TODO: Fix click being blocked by map overlays.
+  // Fix by creating an overlay for the map and using it to handle clicks.
   List<Marker> getMarkersList() {
-    var lst = landmarksPositions.asMap().entries.map((entry) {
+    var lst = landmarks.asMap().entries.map((entry) {
       var index = entry.key;
-      var position = entry.value;
+      var landmark = entry.value;
+
+      const double iconSize = 40;
 
       return Marker(
-        point: position,
-        child: Icon(
-          Icons.location_pin,
-          color: getMarkerColorByIndex(index),
-          shadows: [
-            Shadow(
-              color: Colors.black.withAlpha(196),
-              offset: const Offset(1, 1),
-              blurRadius: 1.0,
+        point: landmark.waypoint.location,
+        height: landmark.isOpened ? 200 : iconSize * 2,
+        width: landmark.isOpened ? 200 : iconSize,
+        alignment: Alignment.topCenter,
+        child: GestureDetector(
+          onTap: () => setState(() {
+            landmark.isOpened = !landmark.isOpened;
+          }),
+          child: Container(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (landmark.isOpened)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Text(
+                                "Waypoint #${landmark.waypoint.waypointIndex}",
+                                style: ThemeData.light().textTheme.headlineLarge!.copyWith(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                            if ((landmark.waypoint.name != null && landmark.waypoint.name!.isNotEmpty))
+                              Text(
+                                landmark.waypoint.name!,
+                              ),
+                            Text("Latitude: ${landmark.waypoint.location.latitude}"),
+                            Text("Longitude: ${landmark.waypoint.location.longitude}"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                Icon(
+                  Icons.location_pin,
+                  color: getMarkerColorByIndex(index),
+                  size: iconSize,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withAlpha(196),
+                      offset: const Offset(1, 1),
+                      blurRadius: 1.0,
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }).toList();
@@ -73,7 +130,7 @@ class _MapComponentState extends State<MapPage> {
     return lst;
   }
 
-  void generateRandomRoute() {
+  Future generateRandomRoute() async {
     const int numberOfPoints = 10;
     const double range = 0.01;
     // Get random points around center
@@ -82,7 +139,8 @@ class _MapComponentState extends State<MapPage> {
       isRouteGenerationAvailable = false;
     });
 
-    landmarksPositions = [];
+    var positions = <LatLng>[];
+    landmarks = [];
     for (int i = 0; i < numberOfPoints; i++) {
       var offsetLat = Random().nextDouble() * range;
       var offsetLng = Random().nextDouble() * range;
@@ -90,17 +148,16 @@ class _MapComponentState extends State<MapPage> {
       var lat = initialCenter.latitude + (Random().nextBool() ? offsetLat : -offsetLat);
       var lng = initialCenter.longitude + (Random().nextBool() ? offsetLng : -offsetLng);
 
-      landmarksPositions.add(LatLng(lat, lng));
+      positions.add(LatLng(lat, lng));
     }
 
     setState(() {
       currentRoute = [];
     });
 
-    MapUtils.getTripBetweenPoints(
-      userPosition,
-      landmarksPositions,
-    ).then((trip) {
+    try {
+      var trip = await MapUtils.getTripBetweenPoints(userPosition, positions);
+
       setState(() {
         currentRoute = trip.routes.asMap().entries.map(
           (entry) {
@@ -142,9 +199,32 @@ class _MapComponentState extends State<MapPage> {
         // Skip 1 to avoid user position
         var waypoints = trip.waypoints.skip(1).toList();
         waypoints.sort((w1, w2) => w1.waypointIndex!.compareTo(w2.waypointIndex!));
-        landmarksPositions = waypoints.map((waypoint) => waypoint.location).toList();
-        isRouteGenerationAvailable = true;
+        landmarks = waypoints.map((entry) {
+          return MapWaypoint(entry, isOpened: false);
+        }).toList();
       });
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Error"),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      isRouteGenerationAvailable = true;
     });
   }
 
