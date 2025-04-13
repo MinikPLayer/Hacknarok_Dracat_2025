@@ -13,13 +13,12 @@ interface UserRanking {
   avatar: string;
   points: number;
   visitedPlaces: number;
-  globalRank: number; // Nowe pole dla rankingu globalnego
-  levelRank: number;  // Nowe pole dla rankingu w poziomie
+  globalRank: number;
+  levelRank: number;
   level: number;
 }
 
 const RankingPage = () => {
-  // Mock data - w rzeczywistej aplikacji dane będą pobierane z API
   const allUsers: UserRanking[] = [
     { id: 1, name: "Jan Kowalski", avatar: "", points: 2450, visitedPlaces: 32, globalRank: 1, levelRank: 1, level: 9 },
     { id: 2, name: "Anna Nowak", avatar: "", points: 1980, visitedPlaces: 28, globalRank: 2, levelRank: 1, level: 8 },
@@ -40,19 +39,12 @@ const RankingPage = () => {
 
   const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
   const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
-
-  // Znajdź aktualnego użytkownika (w rzeczywistej aplikacji dane będą pobierane z kontekstu/API)
   const [user, setUser] = useState<UserRanking | null>(null);
-  const currentUser = allUsers.find(user2 => user?.id); // Przykładowe ID
   const token = localStorage.getItem("access");
-
 
   if (!isUserAuthenticated()) {
     return <Navigate to="/login" />;
   }
-
-
-
 
   // Grupuj użytkowników według poziomów
   const usersByLevel: Record<number, UserRanking[]> = {};
@@ -83,25 +75,69 @@ const RankingPage = () => {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await client.get(API_BASE_URL + "user/", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                setUser(response.data);
-                console.log("Zalogowano");
-                console.log(response.data);
-            } catch (error) {
-                console.log("Nie udało się zalogować");
-            }
-        };
+    const fetchUserData = async () => {
+      try {
+        const response = await client.get(API_BASE_URL + "user/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.log("Nie udało się pobrać danych użytkownika");
+      }
+    };
 
-        if (token) {
-            fetchUserData();
-        }
-    }, [token]);
+    if (token) {
+      fetchUserData();
+    }
+  }, [token]);
+
+  // Znajdź aktualnego użytkownika w rankingu
+  const currentUser = user ? allUsers.find(u => u.id === user.id) : null;
+
+  // Funkcja renderująca podium
+  const renderPodium = (users: UserRanking[], isLevelRanking: boolean = false) => {
+    const topUsers = users.slice(0, 3);
+    
+    return (
+      <div className="podium-container">
+        {topUsers.map(user => (
+          <div key={user.id} className={`podium-item ${isLevelRanking ? 
+            (user.levelRank === 1 ? 'gold' : user.levelRank === 2 ? 'silver' : 'bronze') :
+            (user.globalRank === 1 ? 'gold' : user.globalRank === 2 ? 'silver' : 'bronze')}`}>
+            <div className="podium-rank">
+              {isLevelRanking ? (
+                user.levelRank === 1 ? <FaMedal className="gold-medal" /> : 
+                user.levelRank === 2 ? <FaMedal className="silver-medal" /> : 
+                <FaMedal className="bronze-medal" />
+              ) : (
+                user.globalRank === 1 ? <FaMedal className="gold-medal" /> : 
+                user.globalRank === 2 ? <FaMedal className="silver-medal" /> : 
+                <FaMedal className="bronze-medal" />
+              )}
+              <span>#{isLevelRanking ? user.levelRank : user.globalRank}</span>
+            </div>
+            <div className="podium-avatar">
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name} />
+              ) : (
+                <FaUserAlt className="default-avatar" />
+              )}
+            </div>
+            <div className="podium-details">
+              <h3>{user.name}</h3>
+              <div className="podium-stats">
+                <span><FaGlobeAmericas /> {user.visitedPlaces} places</span>
+                <span>{user.points} pts</span>
+                {isLevelRanking && <span>Lvl {user.level}</span>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="ranking-container">
@@ -143,34 +179,14 @@ const RankingPage = () => {
         ))}
       </div>
 
-      {/* Top 3 użytkowników globalnie lub w poziomie */}
+      {/* Podium dla wybranego widoku */}
       {filteredUsers.length > 0 && (
-        <div className="podium-container">
-          {filteredUsers.slice(0, 3).map(user => (
-            <div key={user.id} className={`podium-item ${user.globalRank === 1 ? 'gold' : user.globalRank === 2 ? 'silver' : 'bronze'}`}>
-              <div className="podium-rank">
-                {user.globalRank === 1 ? <FaMedal className="gold-medal" /> : 
-                 user.globalRank === 2 ? <FaMedal className="silver-medal" /> : 
-                 <FaMedal className="bronze-medal" />}
-                <span>#{selectedLevel === 'all' ? user.globalRank : user.levelRank} {selectedLevel !== 'all' && `(Lvl ${user.level})`}</span>
-              </div>
-              <div className="podium-avatar">
-                {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} />
-                ) : (
-                  <FaUserAlt className="default-avatar" />
-                )}
-              </div>
-              <div className="podium-details">
-                <h3>{user.name}</h3>
-                <div className="podium-stats">
-                  <span><FaGlobeAmericas /> {user.visitedPlaces} places</span>
-                  <span>{user.points} pts</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <>
+          <h2 className="ranking-title">
+            {selectedLevel === 'all' ? 'Global Top Travelers' : `Level ${selectedLevel} Top Travelers`}
+          </h2>
+          {renderPodium(filteredUsers, selectedLevel !== 'all')}
+        </>
       )}
 
       {/* Lista poziomów z rankingiem */}
@@ -196,32 +212,37 @@ const RankingPage = () => {
                 </div>
                 
                 {isExpanded && (
-                  <div className="ranking-list">
-                    <div className="ranking-list-header">
-                      <span>#</span>
-                      <span>User</span>
-                      <span>Places</span>
-                      <span>Points</span>
-                    </div>
-                    {levelUsers.map(user => (
-                      <div 
-                        key={user.id} 
-                        className={`ranking-item ${currentUser?.id === user.id ? 'current-user' : ''}`}
-                      >
-                        <span className="rank-number">{user.levelRank}</span>
-                        <div className="user-info">
-                          {user.avatar ? (
-                            <img src={user.avatar} alt={user.name} className="user-avatar" />
-                          ) : (
-                            <FaUserAlt className="default-avatar" />
-                          )}
-                          <span>{user.name}</span>
-                        </div>
-                        <span className="visited-places">{user.visitedPlaces}</span>
-                        <span className="user-points">{user.points} pts</span>
+                  <>
+                    <h4 className="level-podium-title">Top 3 in Level {level}</h4>
+                    {renderPodium(levelUsers, true)}
+                    
+                    <div className="ranking-list">
+                      <div className="ranking-list-header">
+                        <span>#</span>
+                        <span>User</span>
+                        <span>Places</span>
+                        <span>Points</span>
                       </div>
-                    ))}
-                  </div>
+                      {levelUsers.map(user => (
+                        <div 
+                          key={user.id} 
+                          className={`ranking-item ${currentUser?.id === user.id ? 'current-user' : ''}`}
+                        >
+                          <span className="rank-number">{user.levelRank}</span>
+                          <div className="user-info">
+                            {user.avatar ? (
+                              <img src={user.avatar} alt={user.name} className="user-avatar" />
+                            ) : (
+                              <FaUserAlt className="default-avatar" />
+                            )}
+                            <span>{user.name}</span>
+                          </div>
+                          <span className="visited-places">{user.visitedPlaces}</span>
+                          <span className="user-points">{user.points} pts</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
             );
