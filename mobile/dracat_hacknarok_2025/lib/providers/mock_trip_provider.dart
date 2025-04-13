@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:dracat_hacknarok_2025/dialogs/location_mode_dialog.dart';
+import 'package:dracat_hacknarok_2025/model/location_model.dart';
 import 'package:dracat_hacknarok_2025/model/trip_model.dart';
 
 import 'package:dracat_hacknarok_2025/utils/map_utils.dart';
@@ -94,9 +96,59 @@ class MockTripProvider extends ChangeNotifier {
     }
 
     var tripData = await MapUtils.getTripBetweenPoints(points.map((e) => e.getLocation()).toList());
+    tripData.waypoints.removeWhere((x) {
+      for (var p in trip.visitedPointsList) {
+        var distance = Distance().as(LengthUnit.Meter, p.getLocation(), x.location);
+        if (distance < 1.0) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+
     _activeTripData = ActiveTripData(activeTrip: trip, waypoints: tripData.waypoints, routes: tripData.routes);
 
     notifyListeners();
+  }
+
+  void flagWaypointAsVisited(OSRMWaypoint waypoint) {
+    if (_activeTripData == null) return;
+
+    var trip = _activeTripData!.activeTrip;
+    if (trip == null) return;
+
+    try {
+      var points = trip.points.toList();
+      points.sort((x1, x2) {
+        var distance1 = Distance().as(LengthUnit.Meter, x1.getLocation(), waypoint.location);
+        var distance2 = Distance().as(LengthUnit.Meter, x2.getLocation(), waypoint.location);
+
+        return distance1.compareTo(distance2);
+      });
+      var first = points[0];
+
+      trip.visitedPointsList.add(first);
+      saveState(_tripState);
+      notifyListeners();
+    } catch (e) {
+      // Handle the case where the point is not found in the list
+      print("Error - no point in active trip: $e");
+    }
+
+    try {
+      _activeTripData!.waypoints.remove(waypoint);
+      if (waypoint.waypointIndex == 0) {
+        _activeTripData!.routes.removeAt(0);
+      }
+    } catch (e) {
+      // Handle the case where the point is not found in the list
+      print("Error: $e");
+    }
+
+    if (trip.points.length <= trip.visitedPointsList.length) {
+      finishActiveTrip();
+    }
   }
 
   ActiveTripData? getActiveTripData() {
@@ -122,6 +174,16 @@ class MockTripProvider extends ChangeNotifier {
     _tripState?.completedTrips.add(trip);
     saveState(_tripState);
     notifyListeners();
+  }
+
+  void finishActiveTrip() {
+    if (_tripState?.activeTrip != null) {
+      _tripState?.completedTrips.add(_tripState!.activeTrip!);
+      _tripState?.activeTrip = null;
+      _activeTripData = null;
+      saveState(_tripState);
+      notifyListeners();
+    }
   }
 
   void stopActiveTrip() {

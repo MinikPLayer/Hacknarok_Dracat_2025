@@ -1,3 +1,4 @@
+import 'package:dracat_hacknarok_2025/components/location_details_component.dart';
 import 'package:dracat_hacknarok_2025/components/map_demo_menu_component.dart';
 import 'package:dracat_hacknarok_2025/mics/tile_provider.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_trip_provider.dart';
@@ -30,6 +31,9 @@ class _MapComponentState extends State<MapPage> {
   DateTime lastWaypointUpdate = DateTime.fromMicrosecondsSinceEpoch(0);
 
   static const Duration waypointUpdateInterval = Duration(seconds: 2);
+
+  OSRMWaypoint? currentlyVisitingWaypoint;
+  static const double minAutoVisitDistance = 75.0;
 
   Color getMarkerColorByIndex(bool isRouteEmpty, int index) {
     if (isRouteEmpty) {
@@ -190,6 +194,26 @@ class _MapComponentState extends State<MapPage> {
     }
   }
 
+  void checkForUserBeingCloseToWaypoint(LatLng? userPosition, List<OSRMWaypoint> waypoints) {
+    if (userPosition == null) {
+      return;
+    }
+
+    for (var waypoint in waypoints) {
+      var distance = Distance().as(LengthUnit.Meter, userPosition, waypoint.location);
+      if (distance < minAutoVisitDistance) {
+        setState(() {
+          currentlyVisitingWaypoint = waypoint;
+        });
+        return;
+      }
+    }
+
+    setState(() {
+      currentlyVisitingWaypoint = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var tripProvider = Provider.of<MockTripProvider>(context, listen: true);
@@ -221,6 +245,19 @@ class _MapComponentState extends State<MapPage> {
 
     if (userProvider.currentUserLocation != null) {
       updateNearestPointAndRouteIfNescessary(userProvider.currentUserLocation!, activeTripData.waypoints);
+      checkForUserBeingCloseToWaypoint(userProvider.currentUserLocation, activeTripData.waypoints);
+    }
+
+    if (currentlyVisitingWaypoint != null) {
+      return LocationDetailsComponent(
+        location: currentlyVisitingWaypoint!,
+        onBackPressed: () {
+          setState(() {
+            tripProvider.flagWaypointAsVisited(currentlyVisitingWaypoint!);
+            currentlyVisitingWaypoint = null;
+          });
+        },
+      );
     }
 
     var polyLines = activeTripData.routes.asMap().entries.map(

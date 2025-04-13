@@ -150,6 +150,7 @@ class _LocationSwiperPageState extends State<LocationSwiperPage> {
                                       var tripData = TripModel(
                                         points: selectedEntries.map((entry) => entry.location).toList(),
                                         name: tripNamecontroller.text,
+                                        visitedPointsList: [],
                                       );
                                       Provider.of<MockTripProvider>(context, listen: false).setActiveTrip(tripData);
                                     },

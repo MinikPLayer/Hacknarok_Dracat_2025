@@ -102,6 +102,16 @@ class OSRMWaypoint {
       waypointIndex: json['waypoint_index'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'location': [location.longitude, location.latitude],
+      'name': name,
+      'hint': hint,
+      'distance': distance,
+      'waypoint_index': waypointIndex,
+    };
+  }
 }
 
 class MapRoute {
