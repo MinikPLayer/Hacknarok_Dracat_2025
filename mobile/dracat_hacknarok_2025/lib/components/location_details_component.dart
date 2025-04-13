@@ -162,7 +162,7 @@ class _LocationDetailsComponentState extends State<LocationDetailsComponent> {
                       ),
                     ),
                     SizedBox(
-                      width: 400,
+                      width: 375,
                       child: Text(
                         llmSummaries[Random(calculateSeed(widget.locationName)).nextInt(llmSummaries.length)],
                         softWrap: true,

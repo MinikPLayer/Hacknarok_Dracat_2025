@@ -10,6 +10,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class MapPage extends StatefulWidget {
+  static const LatLng initialCenter = LatLng(50.0645, 19.9234);
+
   const MapPage({super.key});
 
   @override
@@ -20,8 +22,6 @@ class _MapComponentState extends State<MapPage> {
   MapController mapController = MapController();
 
   OSRMWaypoint? openedLandmark;
-
-  LatLng initialCenter = LatLng(50.0645, 19.9234);
 
   static Color nearestColor = Colors.green;
   static Color secondColor = Colors.green.withBlue(64);
@@ -162,7 +162,6 @@ class _MapComponentState extends State<MapPage> {
 
       var activeTrip = tripProvider.getActiveTrip();
       if (userProvider.currentUserLocation != null && activeTrip != null) {
-        initialCenter = userProvider.currentUserLocation!;
         tripProvider.updateActiveTripData(activeTrip, userProvider.currentUserLocation);
       }
     });
@@ -335,7 +334,7 @@ class _MapComponentState extends State<MapPage> {
         body: Stack(
           children: [
             FlutterMap(
-              options: MapOptions(initialCenter: initialCenter),
+              options: MapOptions(initialCenter: MapPage.initialCenter),
               mapController: mapController,
               children: [
                 openStreetMapTileLayer,

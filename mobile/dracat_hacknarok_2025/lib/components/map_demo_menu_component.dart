@@ -1,3 +1,4 @@
+import 'package:dracat_hacknarok_2025/pages/current_trip_map_page.dart';
 import 'package:dracat_hacknarok_2025/providers/mock_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
@@ -50,7 +51,7 @@ class _MapDemoMenuComponentState extends State<MapDemoMenuComponent> {
                             value: widget.userProvider.forceMockLocation,
                             onChanged: (v) {
                               setState(() {
-                                var curRealLocation = widget.userProvider.currentRealLocation ?? LatLng(0, 0);
+                                var curRealLocation = widget.userProvider.currentRealLocation ?? MapPage.initialCenter;
                                 widget.userProvider.forceMockLocation = v;
                                 widget.userProvider.setUserMockLocation(curRealLocation);
                               });
@@ -65,8 +66,8 @@ class _MapDemoMenuComponentState extends State<MapDemoMenuComponent> {
                                       curMockLocation.latitude - v.y * 0.001, curMockLocation.longitude + v.x * 0.001),
                                 );
                               } else {
-                                widget.userProvider
-                                    .setUserMockLocation(widget.userProvider.currentRealLocation ?? LatLng(0, 0));
+                                widget.userProvider.setUserMockLocation(
+                                    widget.userProvider.currentRealLocation ?? MapPage.initialCenter);
                               }
                             })
                         ],
