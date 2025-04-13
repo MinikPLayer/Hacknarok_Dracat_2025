@@ -83,7 +83,7 @@ const CustomNavbar = () => {
                             </>
                         ) : (
                             <IconButton href="/notifications" sx={{ color: 'white', mx: 1 }}>
-                                <Badge badgeContent={4} color="primary">
+                                <Badge badgeContent={2} color="primary">
                                     <CircleNotificationsRoundedIcon />
                                 </Badge>
                             </IconButton>

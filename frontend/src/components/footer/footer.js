@@ -6,8 +6,7 @@ import {
   Link as MUILink,
   IconButton,
   Divider,
-  Container,
-  useTheme
+  Container
 } from '@mui/material';
 import {
   Facebook,
@@ -21,8 +20,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
-  const theme = useTheme();
-
   const socialLinks = [
     { icon: <Facebook />, label: "Facebook", href: "#" },
     { icon: <Twitter />, label: "Twitter", href: "#" },
@@ -46,28 +43,25 @@ const Footer = () => {
     <Box
       component="footer"
       sx={{
-        backgroundColor: theme.palette.background.paper,
-        color: theme.palette.text.primary,
+        backgroundColor: '#000',
+        color: '#fff',
         pt: 8,
         pb: 4,
-        borderTop: `1px solid ${theme.palette.divider}`,
+        borderTop: '1px solid #444',
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={6}>
+        <Grid container spacing={6} justifyContent="center">
           {/* Quick Links */}
           <Grid item xs={12} sm={6} md={4}>
             <Typography
               variant="h6"
               gutterBottom
-              sx={{
-                fontWeight: 700,
-                color: theme.palette.primary.main,
-              }}
+              sx={{ fontWeight: 700, color: '#fff', textAlign: 'center' }}
             >
               Szybkie linki
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, alignItems: 'center' }}>
               {quickLinks.map((link, index) => (
                 <motion.div
                   key={index}
@@ -77,14 +71,14 @@ const Footer = () => {
                   <MUILink
                     component={RouterLink}
                     to={link.to}
-                    color="text.secondary"
+                    color="#ccc"
                     underline="none"
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
                       transition: 'color 0.3s',
                       '&:hover': {
-                        color: theme.palette.primary.main,
+                        color: '#fff',
                       }
                     }}
                   >
@@ -100,32 +94,29 @@ const Footer = () => {
             <Typography
               variant="h6"
               gutterBottom
-              sx={{
-                fontWeight: 700,
-                color: theme.palette.primary.main,
-              }}
+              sx={{ fontWeight: 700, color: '#fff', textAlign: 'center' }}
             >
               Kontakt
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
               {contactInfo.map((info, index) => (
                 <Box
                   key={index}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    color: theme.palette.text.secondary,
+                    color: '#ccc',
                   }}
                 >
                   {info.icon}
                   <MUILink
                     href={info.href}
-                    color="inherit"
+                    color="#ccc"
                     underline="hover"
                     sx={{
                       transition: 'color 0.3s',
                       '&:hover': {
-                        color: theme.palette.primary.main,
+                        color: '#fff',
                       }
                     }}
                   >
@@ -141,10 +132,7 @@ const Footer = () => {
             <Typography
               variant="h6"
               gutterBottom
-              sx={{
-                fontWeight: 700,
-                color: theme.palette.primary.main,
-              }}
+              sx={{ fontWeight: 700, color: '#fff', textAlign: 'center' }}
             >
               Śledź nas
             </Typography>
@@ -152,6 +140,7 @@ const Footer = () => {
               sx={{
                 display: 'flex',
                 gap: 1,
+                justifyContent: 'center',
                 flexWrap: 'wrap',
               }}
             >
@@ -165,11 +154,10 @@ const Footer = () => {
                     href={social.href}
                     aria-label={social.label}
                     sx={{
-                      color: theme.palette.text.secondary,
-                      backgroundColor: theme.palette.action.hover,
+                      color: '#fff',
+                      backgroundColor: '#222',
                       '&:hover': {
-                        backgroundColor: theme.palette.primary.main,
-                        color: theme.palette.primary.contrastText,
+                        backgroundColor: '#444',
                       },
                       transition: 'all 0.3s',
                     }}
@@ -185,7 +173,7 @@ const Footer = () => {
         <Divider
           sx={{
             my: 6,
-            backgroundColor: theme.palette.divider,
+            backgroundColor: '#444',
           }}
         />
 
@@ -193,11 +181,11 @@ const Footer = () => {
           variant="body2"
           align="center"
           sx={{
-            color: theme.palette.text.secondary,
-            opacity: 0.8,
+            color: '#ccc',
+            mt: 4,
           }}
         >
-          &copy; {new Date().getFullYear()} MiUn. Wszelkie prawa zastrzeżone.
+          &copy; {new Date().getFullYear()} NineWonders. Wszelkie prawa zastrzeżone.
         </Typography>
       </Container>
     </Box>
