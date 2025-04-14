@@ -107,7 +107,7 @@ const WorldResult = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setResponse(res.data.response);
+        setResponse(res.data);
       } catch (error) {
         console.error(error);
         setResponse('Something went wrong.');
@@ -117,7 +117,7 @@ const WorldResult = () => {
     if(!response){
       fetchData();
     }
-  }, []);
+  }, [response, token]);
 
   const handleImageClick = (index: number) => {
     const globalIndex = currentPhotoSet * 4 + index;
@@ -227,7 +227,7 @@ const WorldResult = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#d76d77', fontWeight: 'bold' }}>
               AI Podsumowanie Trasy
             </Typography>
-            <Typography paragraph sx={{ color: '#5d4037' }}>{response}</Typography>
+            <Typography sx={{ color: '#5d4037' }}>{response}</Typography>
           
           </Paper>
         </Col>
